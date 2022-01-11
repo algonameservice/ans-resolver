@@ -8,7 +8,7 @@ router.get('/:name', async function(req, res){
 
     let name = req.params.name;
     const params = req.query;
-    name = name.split('.')[0];
+    name = name.split('.algo')[0];
     name = 'test-'+name;
     let result; 
     
