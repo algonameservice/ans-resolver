@@ -1,0 +1,12 @@
+runtime: nodejs14
+env_variables:
+  PURESTAKE_CLIENT_URL: "https://testnet-algorand.api.purestake.io/ps2"
+  PURESTAKE_INDEXER_URL: "https://testnet-algorand.api.purestake.io/idx2"
+  PURESTAKE_API_KEY: "cO9tTMC15iatR1J6xv0sx33fl12y8X8D48eTyuNp"
+  APP_ID: "56907092"
+instance_class: F2
+automatic_scaling:
+  min_idle_instances: automatic
+  max_idle_instances: automatic
+  min_pending_latency: automatic
+  max_pending_latency: automatic
