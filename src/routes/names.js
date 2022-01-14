@@ -4,27 +4,39 @@ const algosdk = require('algosdk');
 
 const helper = require('../helper/Algorand.js');
 
+let cachedResponses = {}
+
 router.get('/:name', async function(req, res){
 
     let name = req.params.name;
     const params = req.query;
     name = name.split('.algo')[0];
     name = 'test-'+name;
-    let result; 
     
-    if(params.socials === 'true') {
-        result = await helper.searchForName(name);
-    }
-    else {
-        result = await helper.getAddress(name);
+    if(cachedResponses[name] !== undefined) {
+        res.status(200).json({found: true, address: cachedResponses[name]})
     }
     
-    if(result.found) {
-        res.status(200).json(result);
-    }
     else {
-        res.status(404).json(result);
+        let result; 
+    
+        if(params.socials === 'true') {
+            result = await helper.searchForName(name);
+        }
+        else {
+            result = await helper.getAddress(name);
+        }
+        
+        if(result.found) {
+            cachedResponses[name] = result.address;
+            res.status(200).json(result);
+        }
+        else {
+            res.status(404).json(result);
+        }
     }
+
+    
   
 })
 
