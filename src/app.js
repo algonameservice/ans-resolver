@@ -6,6 +6,7 @@ const helmet = require('helmet');
 
 const indexRouter = require('./routes/index');
 const nameRouter = require('./routes/names');
+const accountRouter = require('./routes/account');
 
 const errorHandler = require('./middleware/errorHandler');
 
@@ -37,6 +38,7 @@ app.use((req, res, next) => {
 });
 
 app.use('/names', nameRouter);
+app.use('/account', accountRouter);
 app.use('/', indexRouter);
 
 

@@ -13,18 +13,17 @@ const Algorand = {
 
     generateTeal : (name) => {
         
-        const tealCode = `
-        #pragma version 3
+        const tealCode = `#pragma version 4
         byte "${name}"
         len
         int 3
         ==
-        bnz main_l6
+        bnz main_l16
         byte "${name}"
         len
         int 4
         ==
-        bnz main_l5
+        bnz main_l10
         byte "${name}"
         len
         int 5
@@ -33,133 +32,257 @@ const Algorand = {
         err
         main_l4:
         gtxn 0 Amount
-        int 32000000
+        int 5000000
         >=
         assert
         global GroupSize
-        int 5
+        int 2
         ==
-        gtxn 0 Receiver
-        addr U3GZ7TNYIHWBZK45PAJZFYXQAPJDTKRBMYZH4ZBCWZQ63NNSQKCZU56IF4
+        global GroupSize
+        int 4
         ==
-        &&
-        gtxn 1 Sender
-        gtxn 0 Sender
-        ==
-        &&
-        gtxn 1 Receiver
-        gtxn 2 Sender
-        ==
-        &&
-        gtxn 2 ApplicationID
-        int 56907092
-        ==
-        &&
-        gtxn 3 RekeyTo
-        gtxn 0 Sender
-        ==
-        &&
-        gtxn 3 Sender
-        gtxn 2 Sender
-        ==
-        &&
-        gtxn 4 ApplicationID
-        int 56907092
-        ==
-        &&
-        gtxn 4 Sender
-        gtxn 0 Sender
-        ==
-        &&
+        ||
         assert
-        int 1
-        b main_l7
-        main_l5:
-        gtxn 0 Amount
-        int 125000000
-        >=
+        gtxn 0 Sender
+        gtxn 1 Sender
+        ==
+        assert
+        gtxn 0 Receiver
+        addr TNU6NTSJA3BX2T4ZLYAHHTPAO7QUOGYD3YNUVHU37RZIDFQWQXB3LCQ244
+        ==
         assert
         global GroupSize
-        int 5
+        int 2
         ==
-        gtxn 0 Receiver
-        addr U3GZ7TNYIHWBZK45PAJZFYXQAPJDTKRBMYZH4ZBCWZQ63NNSQKCZU56IF4
-        ==
-        &&
-        gtxn 1 Sender
-        gtxn 0 Sender
-        ==
-        &&
-        gtxn 1 Receiver
-        gtxn 2 Sender
-        ==
-        &&
-        gtxn 2 ApplicationID
-        int 56907092
-        ==
-        &&
-        gtxn 3 RekeyTo
-        gtxn 0 Sender
-        ==
-        &&
-        gtxn 3 Sender
-        gtxn 2 Sender
-        ==
-        &&
-        gtxn 4 ApplicationID
-        int 56907092
-        ==
-        &&
-        gtxn 4 Sender
-        gtxn 0 Sender
-        ==
-        &&
-        assert
-        int 1
-        b main_l7
-        main_l6:
-        gtxn 0 Amount
-        int 313000000
-        >=
-        assert
+        bnz main_l9
         global GroupSize
-        int 5
+        int 4
         ==
-        gtxn 0 Receiver
-        addr U3GZ7TNYIHWBZK45PAJZFYXQAPJDTKRBMYZH4ZBCWZQ63NNSQKCZU56IF4
-        ==
-        &&
-        gtxn 1 Sender
-        gtxn 0 Sender
-        ==
-        &&
-        gtxn 1 Receiver
-        gtxn 2 Sender
-        ==
-        &&
-        gtxn 2 ApplicationID
-        int 56907092
-        ==
-        &&
-        gtxn 3 RekeyTo
-        gtxn 0 Sender
-        ==
-        &&
-        gtxn 3 Sender
-        gtxn 2 Sender
-        ==
-        &&
-        gtxn 4 ApplicationID
-        int 56907092
-        ==
-        &&
-        gtxn 4 Sender
-        gtxn 0 Sender
-        ==
-        &&
-        assert
-        int 1
+        bnz main_l8
+        int 0
+        return
         main_l7:
+        int 1
+        assert
+        int 1
+        b main_l22
+        main_l8:
+        gtxn 1 Receiver
+        gtxn 2 Sender
+        ==
+        gtxn 2 ApplicationID
+        int 67266758
+        ==
+        &&
+        gtxn 2 OnCompletion
+        int OptIn
+        ==
+        &&
+        gtxn 3 ApplicationID
+        int 67266758
+        ==
+        &&
+        gtxn 3 Sender
+        gtxn 0 Sender
+        ==
+        &&
+        gtxna 3 ApplicationArgs 0
+        byte "register_name"
+        ==
+        &&
+        gtxna 3 ApplicationArgs 1
+        byte "${name}"
+        ==
+        &&
+        assert
+        b main_l7
+        main_l9:
+        gtxn 1 ApplicationID
+        int 67266758
+        ==
+        gtxn 1 Sender
+        gtxn 0 Sender
+        ==
+        &&
+        gtxna 1 ApplicationArgs 0
+        byte "register_name"
+        ==
+        &&
+        gtxna 1 ApplicationArgs 1
+        byte "${name}"
+        ==
+        &&
+        assert
+        b main_l7
+        main_l10:
+        gtxn 0 Amount
+        int 50000000
+        >=
+        assert
+        global GroupSize
+        int 2
+        ==
+        global GroupSize
+        int 4
+        ==
+        ||
+        assert
+        gtxn 0 Sender
+        gtxn 1 Sender
+        ==
+        assert
+        gtxn 0 Receiver
+        addr TNU6NTSJA3BX2T4ZLYAHHTPAO7QUOGYD3YNUVHU37RZIDFQWQXB3LCQ244
+        ==
+        assert
+        global GroupSize
+        int 2
+        ==
+        bnz main_l15
+        global GroupSize
+        int 4
+        ==
+        bnz main_l14
+        int 0
+        return
+        main_l13:
+        int 1
+        assert
+        int 1
+        b main_l22
+        main_l14:
+        gtxn 1 Receiver
+        gtxn 2 Sender
+        ==
+        gtxn 2 ApplicationID
+        int 67266758
+        ==
+        &&
+        gtxn 2 OnCompletion
+        int OptIn
+        ==
+        &&
+        gtxn 3 ApplicationID
+        int 67266758
+        ==
+        &&
+        gtxn 3 Sender
+        gtxn 0 Sender
+        ==
+        &&
+        gtxna 3 ApplicationArgs 0
+        byte "register_name"
+        ==
+        &&
+        gtxna 3 ApplicationArgs 1
+        byte "${name}"
+        ==
+        &&
+        assert
+        b main_l13
+        main_l15:
+        gtxn 1 ApplicationID
+        int 67266758
+        ==
+        gtxn 1 Sender
+        gtxn 0 Sender
+        ==
+        &&
+        gtxna 1 ApplicationArgs 0
+        byte "register_name"
+        ==
+        &&
+        gtxna 1 ApplicationArgs 1
+        byte "${name}"
+        ==
+        &&
+        assert
+        b main_l13
+        main_l16:
+        gtxn 0 Amount
+        int 150000000
+        >=
+        assert
+        global GroupSize
+        int 2
+        ==
+        global GroupSize
+        int 4
+        ==
+        ||
+        assert
+        gtxn 0 Sender
+        gtxn 1 Sender
+        ==
+        assert
+        gtxn 0 Receiver
+        addr TNU6NTSJA3BX2T4ZLYAHHTPAO7QUOGYD3YNUVHU37RZIDFQWQXB3LCQ244
+        ==
+        assert
+        global GroupSize
+        int 2
+        ==
+        bnz main_l21
+        global GroupSize
+        int 4
+        ==
+        bnz main_l20
+        int 0
+        return
+        main_l19:
+        int 1
+        assert
+        int 1
+        b main_l22
+        main_l20:
+        gtxn 1 Receiver
+        gtxn 2 Sender
+        ==
+        gtxn 2 ApplicationID
+        int 67266758
+        ==
+        &&
+        gtxn 2 OnCompletion
+        int OptIn
+        ==
+        &&
+        gtxn 3 ApplicationID
+        int 67266758
+        ==
+        &&
+        gtxn 3 Sender
+        gtxn 0 Sender
+        ==
+        &&
+        gtxna 3 ApplicationArgs 0
+        byte "register_name"
+        ==
+        &&
+        gtxna 3 ApplicationArgs 1
+        byte "${name}"
+        ==
+        &&
+        assert
+        b main_l19
+        main_l21:
+        gtxn 1 ApplicationID
+        int 67266758
+        ==
+        gtxn 1 Sender
+        gtxn 0 Sender
+        ==
+        &&
+        gtxna 1 ApplicationArgs 0
+        byte "register_name"
+        ==
+        &&
+        gtxna 1 ApplicationArgs 1
+        byte "${name}"
+        ==
+        &&
+        assert
+        b main_l19
+        main_l22:
         return`
 
         return tealCode;
@@ -189,25 +312,35 @@ const Algorand = {
             for (let i = 0; i < length; i++) {
                 let app = accountInfo[i];
                 
-                if (app.id === parseInt(process.env.APP_ID)) {
+                if (app.id === parseInt(parseInt(process.env.APP_ID))) {
 
                     let kv = app['key-value'];
 
                     let kvLength = kv.length;
                     let owner;
                     let data = [];
-
+                    let socials = [];
                     
                     for (let j = 0; j < kvLength; j++) {
                         let key = Buffer.from(kv[j].key, 'base64').toString();
                         let value = Buffer.from(kv[j].value.bytes, 'base64').toString();
-
+                        if(key === 'expiry') {
+                            value = new Date(kv[j].value.uint*1000).toDateString();
+                        }
                         let kvObj = {
                             key: key,
                             value: value
                         }
                         
-                        if(key!=='owner') data.push(kvObj)
+                        if(key!=='owner') {
+                            if(key === 'github' 
+                                || key === 'discord' 
+                                || key === 'twitter' 
+                                || key === 'reddit'
+                                || key === 'telegram'
+                                || key === 'youtube') socials.push(kvObj);
+                            else data.push(kvObj)
+                        }
 
                         if (key === 'owner') {
                             value = kv[j].value.bytes;
@@ -215,7 +348,7 @@ const Algorand = {
                             owner = value;
                         }
                         if (j === kvLength - 1 && owner !== undefined) {
-                            return ({ found: true, address: owner, socials: data })
+                            return ({ found: true, address: owner, socials: socials, data: data })
                         }
                     }
                 }
@@ -241,7 +374,15 @@ const Algorand = {
         
     },
 
-    createGroupTxns : async (name, address) => {
+    createGroupTxnsToSign: async (name, address, period) => {
+
+        /* Group Txns Here 
+            1st Transaction: Pay smart contract from user account
+            2nd Transaction: Fund Lsig with user account
+            3rd Transaction: Optin to smart contract from Lsig with user account
+            4th Transaction: Regsiter into smart contract with user account
+        */
+
         const algodClient = client;
 
         /* 1st Txn - Payment to Smart Contract */
@@ -253,18 +394,22 @@ const Algorand = {
         params.fee = 1000;
         params.flatFee = true;
 
-        let receiver = algosdk.getApplicationAddress(parseInt(process.env.APP_ID));
+        let receiver = algosdk.getApplicationAddress(parseInt(parseInt(process.env.APP_ID)));
         let sender = address;
 
-        if (name.length <= 3) return;
-        else if (name.length === 8) amount = 313000000
-        else if (name.length === 9) amount = 125000000
-        else if (name.length >= 10) amount = 32000000
+        if(period === undefined) period = 0
+        else period = period-1
+
+        if (name.length < 3) return;
+        else if (name.length === 3) amount = parseInt(process.env.CHAR_3_AMOUNT) + period*parseInt(process.env.CHAR_3_AMOUNT)
+        else if (name.length === 4) amount = parseInt(process.env.CHAR_4_AMOUNT) + period*parseInt(process.env.CHAR_4_AMOUNT)
+        else if (name.length >= 5) amount = parseInt(process.env.CHAR_5_AMOUNT) + period*parseInt(process.env.CHAR_5_AMOUNT)
 
         let closeToRemaninder = undefined;
         let note = undefined;
 
-
+        
+        
         let txn1 = algosdk.makePaymentTxnWithSuggestedParams(sender, receiver, amount, closeToRemaninder, note, params);
 
         const groupTxns = [];
@@ -274,7 +419,7 @@ const Algorand = {
 
         sender = address;
         receiver = lsig.address();
-        amount = 1100000;
+        amount = 915000;
 
         let txn2 = algosdk.makePaymentTxnWithSuggestedParams(sender, receiver, amount, closeToRemaninder, note, params);
 
@@ -285,7 +430,7 @@ const Algorand = {
         let txn3 = await algosdk.makeApplicationOptInTxnFromObject({
             from: lsig.address(),
             suggestedParams: params,
-            appIndex: this.APP_ID
+            appIndex: parseInt(parseInt(process.env.APP_ID))
         });
 
         groupTxns.push(txn3);
@@ -294,41 +439,254 @@ const Algorand = {
         receiver = address;
         amount = 0;
 
-        /* 4th Txn - Lsig rekey to owner */
-
-        let txn4 = algosdk.makePaymentTxnWithSuggestedParams(sender, receiver, amount, closeToRemaninder, note, params, receiver);
-        groupTxns.push(txn4);
-
-        /* 5th Txn - Lsig registers name */
+        /* 4th Txn - Account registers name */
 
         let method = "register_name";
-        let account = address;
+        
 
         let appArgs = [];
 
-        appArgs.push(new Uint8Array(Buffer.from(method)));
-        appArgs.push(algosdk.decodeAddress(account).publicKey);
-        let txn5 = await algosdk.makeApplicationNoOpTxn(address, params, this.APP_ID, appArgs, [lsig.address()]);
-        groupTxns.push(txn5);
+        period = period+1
 
-        let txGroup = algosdk.assignGroupID(groupTxns);
+        appArgs.push(new Uint8Array(Buffer.from(method)));
+        //appArgs.push(algosdk.decodeAddress(account).publicKey);
+        appArgs.push(new Uint8Array(Buffer.from(name)))
+        appArgs.push(algosdk.encodeUint64(period))
+        let txn4 = await algosdk.makeApplicationNoOpTxn(address, params, parseInt(parseInt(process.env.APP_ID)), appArgs, [lsig.address()]);
+        groupTxns.push(txn4);
+
+        algosdk.assignGroupID(groupTxns);
 
         let signedOptinTxn = algosdk.signLogicSigTransaction(groupTxns[2], lsig);
-        let signedRekeyTxn = algosdk.signLogicSigTransactionObject(groupTxns[3], lsig);
-        
-        const txnsToBeSigned = [groupTxns[0], groupTxns[1], groupTxns[4]];
 
-        return ({ txnsToBeSigned: txnsToBeSigned, txns: groupTxns });
+        return ({ optinTxn: signedOptinTxn, txns: groupTxns });
+
+    },
+
+    async createRenewalTxn (name, sender, years, amt) {
+        //amt = algosdk.algosToMicroalgos(amt);
+        const params = await client.getTransactionParams().do();
+        let receiver = algosdk.getApplicationAddress(parseInt(process.env.APP_ID));
+        let closeToRemaninder=undefined;
+        let note=undefined;
+        let paymentTxn = algosdk.makePaymentTxnWithSuggestedParams(sender, receiver, amt, closeToRemaninder, note, params);
+
+        name = name.split('.algo')[0];
+
+        let lsig = await Algorand.generateLsig(name);
+
+        let appArgs = [];
+        appArgs.push(new Uint8Array(Buffer.from("renew_name")));
+        appArgs.push(algosdk.encodeUint64(years));
+
+        let applicationTxn = algosdk.makeApplicationNoOpTxn(sender, params, parseInt(process.env.APP_ID), appArgs, [lsig.address()]);
+
+        algosdk.assignGroupID([paymentTxn, applicationTxn]);
+
+        const groupTxns = [paymentTxn, applicationTxn];
+        return groupTxns;
+
+    },
+
+    updateName: async (name, address, editedHandles) => {
+
+        const algodClient = client;
+
+        const lsig = await Algorand.generateLsig(name);
+        const params = await algodClient.getTransactionParams().do();
+        params.fee = 1000;
+        params.flatFee = true;
+
+        let method = "update_name";
+
+        const groupTxns = [];
+
+        for(let key in editedHandles) {
+            
+            let appArgs=[];
+            let network = key;
+            let handle = editedHandles[key];
+            
+            appArgs.push(new Uint8Array(Buffer.from(method)));
+            appArgs.push(new Uint8Array(Buffer.from(network)));
+            appArgs.push(new Uint8Array(Buffer.from(handle)));
+
+            let txn = await algosdk.makeApplicationNoOpTxn(address, params, parseInt(parseInt(process.env.APP_ID)), appArgs, [lsig.address()]);
+            groupTxns.push(txn);
+        }
+
+    
+        algosdk.assignGroupID(groupTxns);
+        return groupTxns;
+
+    },
+
+    createTransferTransaction : async (name, sender, newOwner, price) => {
+        price = algosdk.algosToMicroalgos(price);
+        const params = await client.getTransactionParams().do();
+        name = name.split('.algo')[0];
+
+        let lsig = await Algorand.generateLsig(name);
+
+        let appArgs = [];
+        appArgs.push(new Uint8Array(Buffer.from("initiate_transfer")));
+        appArgs.push(algosdk.encodeUint64(price));
+
+        let applicationTxn = algosdk.makeApplicationNoOpTxn(sender, params, parseInt(parseInt(process.env.APP_ID)), appArgs, [lsig.address(), newOwner]);
+        return applicationTxn;
+
+    },
+
+    createConfirmTransferTransactions : async (name, sender, receiver, amt) => {
+        amt = algosdk.algosToMicroalgos(amt);
+        const params = await client.getTransactionParams().do();
+        
+        let closeToRemaninder=undefined;
+        let note=undefined;
+        let paymentToOwnerTxn = algosdk.makePaymentTxnWithSuggestedParams(sender, receiver, amt, closeToRemaninder, note, params);
+
+        receiver = algosdk.getApplicationAddress(parseInt(parseInt(process.env.APP_ID)));
+        
+        let paymentToSmartContractTxn = algosdk.makePaymentTxnWithSuggestedParams(sender, receiver, parseInt(process.env.TRANSFER_FEE), closeToRemaninder, note, params);
+
+        name = name.split('.algo')[0];
+
+        let lsig = await Algorand.generateLsig(name);
+
+        let appArgs = [];
+        appArgs.push(new Uint8Array(Buffer.from("accept_transfer")));
+        
+        let applicationTxn = algosdk.makeApplicationNoOpTxn(sender, params, parseInt(parseInt(process.env.APP_ID)), appArgs, [lsig.address()]);
+
+        algosdk.assignGroupID([paymentToOwnerTxn, paymentToSmartContractTxn, applicationTxn]);
+
+        const groupTxns = [paymentToOwnerTxn, paymentToSmartContractTxn, applicationTxn];
+        return groupTxns;
+
     },
 
     sendTxnToNetwork: async (signed) => {
                 
         try {
-            const sendToNetwork = await this.getClient().sendRawTransaction(signed).do();
+            const sendToNetwork = await client.sendRawTransaction(signed).do();
             return ({success: true});
         } catch (err) {
             return ({success: false, error: err.message});
         }
+    },
+
+    lookupTransactionsByAddress : async (account, socials, metadata) => {
+        
+        const accountTxns = await indexer.lookupAccountTransactions(account).do();
+
+        const txns = accountTxns.transactions;
+        
+        const names = [];
+        
+        try{
+     
+            for(let i=0; i<txns.length; i++) {
+                let txn= txns[i];
+
+                if(txn["tx-type"] === "appl") {
+                    
+                    if(txn["application-transaction"]["application-id"] === parseInt(parseInt(process.env.APP_ID))) {
+                        
+                        let appArgs = txn["application-transaction"]["application-args"];
+                        
+                        if(Buffer.from(appArgs[0], "base64").toString() === "register_name") {
+                            if(!names.includes(Buffer.from(appArgs[1], 'base64').toString())) names.push(Buffer.from(appArgs[1], 'base64').toString())
+                        }
+                        else if(Buffer.from(appArgs[0], 'base64').toString() === "accept_transfer"){
+                            let lsigAccount = txn["application-transaction"]["accounts"][0];
+                            let accountInfo = await indexer.lookupAccountByID(lsigAccount).do();
+                            
+                            accountInfo = accountInfo.account['apps-local-state'];
+                            
+                            const length = accountInfo.length;
+                            for(let i=0; i<length; i++){
+                                if(accountInfo[i].id === parseInt(parseInt(process.env.APP_ID))) {
+                                    let kvPairs = accountInfo[i]["key-value"];
+                                    for(let j=0; j<kvPairs.length; j++) {
+                                        let key = Buffer.from(kvPairs[j].key, 'base64').toString();
+                                        let value = Buffer.from(kvPairs[j].value.bytes, 'base64').toString();
+
+                                        if(key === 'name') {
+                                            
+                                            if(!names.includes(value)) names.push(value);
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+        } catch (err) {
+            
+            return []
+        }
+       
+        if(names.length > 0) {
+
+            let details=[];
+            for(let i=0; i<names.length; i++) {
+                let info = await Algorand.searchForName(names[i]);
+                let data={
+                    socials: {},
+                    metadata: {}
+                };
+                data["name"] = names[i]+'.algo';
+
+                if(!socials) delete data.socials;
+                if(!metadata) delete data.metadata;
+                
+                if(info.found && info.address !== undefined) {
+
+                    if(info.address === account){
+                        let kvPairs = info.socials;
+                        
+                        
+                        if(kvPairs.length > 0) {
+                            for(let j=0; j<kvPairs.length; j++) {
+                                if(kvPairs[j].key === 'expiry') {
+                                    let expiry = kvPairs[j].value;
+                                    data["expiry"] = expiry;
+                                } else {
+                                    if(socials && kvPairs[j].key !== "name") data["socials"][kvPairs[j].key] = kvPairs[j].value
+                                }
+                            }
+                        }
+
+                        kvPairs = info.data;
+                       
+                        if(kvPairs.length > 0) {
+                            for(let j=0; j<kvPairs.length; j++) {
+                                if(kvPairs[j].key === 'expiry') {
+                                    let expiry = kvPairs[j].value;
+                                    data["expiry"] = expiry;
+                                } else {
+                                    if(metadata && kvPairs[j].value !== "" && kvPairs[j].key !== "name") data["metadata"][kvPairs[j].key] = kvPairs[j].value
+                                }
+                            }
+                        }
+                        
+                        details.push(data);
+                        
+                    }
+                    
+                } else {
+                    i = i-1;
+                }
+                
+                
+            }
+            return (details);
+        }
+        
+
     }
 }
 
