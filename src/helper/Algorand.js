@@ -5,9 +5,12 @@ const client = new algosdk.Algodv2({ 'X-API-KEY': process.env.PURESTAKE_API_KEY 
             process.env.PURESTAKE_CLIENT_URL,
             '');
 
+            /*
 const indexer = new algosdk.Indexer({ 'X-API-KEY': process.env.PURESTAKE_API_KEY },
             process.env.PURESTAKE_INDEXER_URL,
-            '');  
+            '');  */
+
+const indexer = new algosdk.Indexer('','https://testnet.algoexplorerapi.io/idx2','');          
 
 const Algorand = {
 
@@ -573,6 +576,38 @@ const Algorand = {
         } catch (err) {
             return ({success: false, error: err.message});
         }
+    },
+
+    lookupApplication: async (timestamp) => {
+        let nextToken = '';
+        let txnLength = 1;
+        let txns = [];
+        let count=0;
+        while(txnLength > 0){
+            try{
+                let info = await indexer.searchForTransactions().applicationID(process.env.APP_ID).
+                limit(10000).
+                nextToken(nextToken).
+                afterTime(timestamp).do();
+                txnLength=info.transactions.length;
+                if(txnLength > 0) {
+                    count++;
+                    nextToken = info["next-token"];
+                    txns.push(info.transactions);
+                }
+                
+            }catch(err){
+                return false;
+            }
+        }
+
+        let allTxns = [];
+        for(let i=0; i<txns.length; i++){
+            allTxns=allTxns.concat(txns[i]);
+        }
+        return allTxns.reverse();
+       
+        
     },
 
     lookupTransactionsByAddress : async (account, socials, metadata) => {

@@ -4,7 +4,108 @@ const router = express.Router();
 
 const helper = require('../helper/Algorand.js');
 
-let cachedResponses = {}
+let cachedResponses = {};
+let nameInfo = {
+    transactions: [],
+    nameRegistrations: 0,
+    nameTransfers: 0,
+    latestPullTimestamp: '',
+    totalTransactions: 0,
+    lastTenRegistrations: []
+};
+
+router.get('/insights', async function(req, res){
+
+    let info;
+    if(nameInfo.transactions.length === 0) {
+        info = await helper.lookupApplication();
+        nameInfo.transactions = info;
+        nameInfo.totalTransactions = info.length;
+        nameInfo.latestPullTimestamp = new Date();
+        
+        for(let i=0; i<info.length; i++) {
+            let args = info[i]["application-transaction"]["application-args"];
+            
+            if(args.length > 0) {
+                if(Buffer.from(args[0], 'base64').toString() === 'register_name'){
+                    nameInfo.nameRegistrations++;
+                } else if(Buffer.from(args[0], 'base64').toString() === 'accept_transfer') {
+                    nameInfo.nameTransfers++;
+                }
+            } 
+        }
+        
+    } else {
+        info = await helper.lookupApplication(nameInfo.latestPullTimestamp);
+        
+        for(let i=0; i<info.length; i++) {
+            let args = info[i]["application-transaction"]["application-args"];
+            
+            if(args.length > 0) {
+                if(Buffer.from(args[0], 'base64').toString() === 'register_name'){
+                    nameInfo.nameRegistrations++;
+                } else if(Buffer.from(args[0], 'base64').toString() === 'accept_transfer') {
+                    nameInfo.nameTransfers++;
+                }
+            } 
+        }
+        if(info.length > 0) {
+            nameInfo.latestPullTimestamp = new Date();
+            nameInfo.transactions = nameInfo.transactions.reverse();
+            nameInfo.transactions = nameInfo.transactions.concat(info.reverse());
+            nameInfo.transactions = nameInfo.transactions.reverse();
+            
+        }
+        
+    }
+
+    let count = 0;
+    let hex;
+    let numberStr='';
+    nameInfo.lastTenRegistrations = [];
+    
+    
+    for(let i=0; i<nameInfo.transactions.length && count < 10; i++) {
+        try{
+            
+            let args = nameInfo.transactions[i]["application-transaction"]["application-args"];
+            let sender = nameInfo.transactions[i]["sender"];
+            numberStr = '';
+            if(args.length > 0) {
+                if(Buffer.from(args[0], 'base64').toString() === 'register_name'){
+                    hex = Buffer.from(args[2], 'base64').toString();
+                    hex = Buffer.from(hex, 'utf-8');
+                    for(let i=0; i<hex.length; i++){
+                        numberStr+=hex[i];
+                    }
+                    numberStr=parseInt(numberStr, 8);
+                    let name = {
+                        owner: sender,
+                        nameRegistered: Buffer.from(args[1], 'base64').toString(),
+                        period: numberStr
+                    };
+                    nameInfo.lastTenRegistrations.push(name);
+                    count++;
+                    
+                } else if(Buffer.from(args[0], 'base64').toString() === 'accept_transfer') {
+                    //nameInfo.nameTransfers++;
+                }
+            } 
+        } catch (err) {
+            console.log(err);
+            console.log(nameInfo.transactions[i]);
+        }
+        
+    }
+
+    res.status(200).json({
+        totalNameRegistrations: nameInfo.nameRegistrations,
+        totalTransactions: nameInfo.transactions.length, 
+        totalNameTransfers: nameInfo.nameTransfers,
+        lastTenRegistrations: nameInfo.lastTenRegistrations
+    });
+    
+});
 
 router.get('/:name', async function(req, res){
 
@@ -312,8 +413,10 @@ router.post('/accept-transfer', async function (req, res) {
 })
 
 
+
 router.get('/', function(req, res){
     res.status(400).send('Provide a name to lookup')
-})
+});
+
 
 module.exports = router
