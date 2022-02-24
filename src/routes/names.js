@@ -19,7 +19,7 @@ router.get('/insights', async function(req, res){
     let info;
     if(nameInfo.transactions.length === 0) {
         info = await helper.lookupApplication();
-        nameInfo.transactions = info;
+        nameInfo.transactions = info.slice(0,50);
         nameInfo.totalTransactions = info.length;
         nameInfo.latestPullTimestamp = new Date();
         
@@ -84,6 +84,7 @@ router.get('/insights', async function(req, res){
                         nameRegistered: Buffer.from(args[1], 'base64').toString(),
                         period: numberStr
                     };
+                    console.log(name.nameRegistered);
                     nameInfo.lastTenRegistrations.push(name);
                     count++;
                     
