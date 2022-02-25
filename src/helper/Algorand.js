@@ -10,7 +10,7 @@ const indexer = new algosdk.Indexer({ 'X-API-KEY': process.env.PURESTAKE_API_KEY
             process.env.PURESTAKE_INDEXER_URL,
             '');  */
 
-const indexer = new algosdk.Indexer('','https://testnet.algoexplorerapi.io/idx2','');          
+const indexer = new algosdk.Indexer('','https://algoexplorerapi.io/idx2','');          
 
 const Algorand = {
 
@@ -21,12 +21,12 @@ const Algorand = {
         len
         int 3
         ==
-        bnz main_l16
+        bnz main_l22
         byte "${name}"
         len
         int 4
         ==
-        bnz main_l10
+        bnz main_l13
         byte "${name}"
         len
         int 5
@@ -38,6 +38,19 @@ const Algorand = {
         int 5000000
         >=
         assert
+        byte "${name}"
+        len
+        int 64
+        <=
+        assert
+        int 0
+        store 0
+        main_l5:
+        load 0
+        byte "${name}"
+        len
+        <
+        bnz main_l12
         global GroupSize
         int 2
         ==
@@ -51,30 +64,30 @@ const Algorand = {
         ==
         assert
         gtxn 0 Receiver
-        addr TNU6NTSJA3BX2T4ZLYAHHTPAO7QUOGYD3YNUVHU37RZIDFQWQXB3LCQ244
+        addr SYGCDTWGBXKV4ZL5YAWSYAVOUC25U2XDB6SMQHLRCTYVF566TQZ3EOABH4
         ==
         assert
         global GroupSize
         int 2
         ==
-        bnz main_l9
+        bnz main_l11
         global GroupSize
         int 4
         ==
-        bnz main_l8
+        bnz main_l10
         int 0
         return
-        main_l7:
+        main_l9:
         int 1
         assert
         int 1
-        b main_l22
-        main_l8:
+        b main_l31
+        main_l10:
         gtxn 1 Receiver
         gtxn 2 Sender
         ==
         gtxn 2 ApplicationID
-        int 67266758
+        int 628095415
         ==
         &&
         gtxn 2 OnCompletion
@@ -82,7 +95,7 @@ const Algorand = {
         ==
         &&
         gtxn 3 ApplicationID
-        int 67266758
+        int 628095415
         ==
         &&
         gtxn 3 Sender
@@ -98,15 +111,11 @@ const Algorand = {
         ==
         &&
         assert
-        b main_l7
-        main_l9:
+        b main_l9
+        main_l11:
         gtxn 1 ApplicationID
-        int 67266758
+        int 628095415
         ==
-        gtxn 1 Sender
-        gtxn 0 Sender
-        ==
-        &&
         gtxna 1 ApplicationArgs 0
         byte "register_name"
         ==
@@ -116,12 +125,55 @@ const Algorand = {
         ==
         &&
         assert
-        b main_l7
-        main_l10:
+        b main_l9
+        main_l12:
+        byte "${name}"
+        load 0
+        getbyte
+        int 97
+        >=
+        byte "${name}"
+        load 0
+        getbyte
+        int 122
+        <=
+        &&
+        byte "${name}"
+        load 0
+        getbyte
+        int 48
+        >=
+        byte "${name}"
+        load 0
+        getbyte
+        int 57
+        <=
+        &&
+        ||
+        assert
+        load 0
+        int 1
+        +
+        store 0
+        b main_l5
+        main_l13:
         gtxn 0 Amount
         int 50000000
         >=
         assert
+        byte "${name}"
+        len
+        int 64
+        <=
+        assert
+        int 0
+        store 0
+        main_l14:
+        load 0
+        byte "${name}"
+        len
+        <
+        bnz main_l21
         global GroupSize
         int 2
         ==
@@ -135,30 +187,30 @@ const Algorand = {
         ==
         assert
         gtxn 0 Receiver
-        addr TNU6NTSJA3BX2T4ZLYAHHTPAO7QUOGYD3YNUVHU37RZIDFQWQXB3LCQ244
+        addr SYGCDTWGBXKV4ZL5YAWSYAVOUC25U2XDB6SMQHLRCTYVF566TQZ3EOABH4
         ==
         assert
         global GroupSize
         int 2
         ==
-        bnz main_l15
+        bnz main_l20
         global GroupSize
         int 4
         ==
-        bnz main_l14
+        bnz main_l19
         int 0
         return
-        main_l13:
+        main_l18:
         int 1
         assert
         int 1
-        b main_l22
-        main_l14:
+        b main_l31
+        main_l19:
         gtxn 1 Receiver
         gtxn 2 Sender
         ==
         gtxn 2 ApplicationID
-        int 67266758
+        int 628095415
         ==
         &&
         gtxn 2 OnCompletion
@@ -166,7 +218,7 @@ const Algorand = {
         ==
         &&
         gtxn 3 ApplicationID
-        int 67266758
+        int 628095415
         ==
         &&
         gtxn 3 Sender
@@ -182,15 +234,11 @@ const Algorand = {
         ==
         &&
         assert
-        b main_l13
-        main_l15:
+        b main_l18
+        main_l20:
         gtxn 1 ApplicationID
-        int 67266758
+        int 628095415
         ==
-        gtxn 1 Sender
-        gtxn 0 Sender
-        ==
-        &&
         gtxna 1 ApplicationArgs 0
         byte "register_name"
         ==
@@ -200,12 +248,55 @@ const Algorand = {
         ==
         &&
         assert
-        b main_l13
-        main_l16:
+        b main_l18
+        main_l21:
+        byte "${name}"
+        load 0
+        getbyte
+        int 97
+        >=
+        byte "${name}"
+        load 0
+        getbyte
+        int 122
+        <=
+        &&
+        byte "${name}"
+        load 0
+        getbyte
+        int 48
+        >=
+        byte "${name}"
+        load 0
+        getbyte
+        int 57
+        <=
+        &&
+        ||
+        assert
+        load 0
+        int 1
+        +
+        store 0
+        b main_l14
+        main_l22:
         gtxn 0 Amount
         int 150000000
         >=
         assert
+        byte "${name}"
+        len
+        int 64
+        <=
+        assert
+        int 0
+        store 0
+        main_l23:
+        load 0
+        byte "${name}"
+        len
+        <
+        bnz main_l30
         global GroupSize
         int 2
         ==
@@ -219,30 +310,30 @@ const Algorand = {
         ==
         assert
         gtxn 0 Receiver
-        addr TNU6NTSJA3BX2T4ZLYAHHTPAO7QUOGYD3YNUVHU37RZIDFQWQXB3LCQ244
+        addr SYGCDTWGBXKV4ZL5YAWSYAVOUC25U2XDB6SMQHLRCTYVF566TQZ3EOABH4
         ==
         assert
         global GroupSize
         int 2
         ==
-        bnz main_l21
+        bnz main_l29
         global GroupSize
         int 4
         ==
-        bnz main_l20
+        bnz main_l28
         int 0
         return
-        main_l19:
+        main_l27:
         int 1
         assert
         int 1
-        b main_l22
-        main_l20:
+        b main_l31
+        main_l28:
         gtxn 1 Receiver
         gtxn 2 Sender
         ==
         gtxn 2 ApplicationID
-        int 67266758
+        int 628095415
         ==
         &&
         gtxn 2 OnCompletion
@@ -250,7 +341,7 @@ const Algorand = {
         ==
         &&
         gtxn 3 ApplicationID
-        int 67266758
+        int 628095415
         ==
         &&
         gtxn 3 Sender
@@ -266,15 +357,11 @@ const Algorand = {
         ==
         &&
         assert
-        b main_l19
-        main_l21:
+        b main_l27
+        main_l29:
         gtxn 1 ApplicationID
-        int 67266758
+        int 628095415
         ==
-        gtxn 1 Sender
-        gtxn 0 Sender
-        ==
-        &&
         gtxna 1 ApplicationArgs 0
         byte "register_name"
         ==
@@ -284,8 +371,38 @@ const Algorand = {
         ==
         &&
         assert
-        b main_l19
-        main_l22:
+        b main_l27
+        main_l30:
+        byte "${name}"
+        load 0
+        getbyte
+        int 97
+        >=
+        byte "${name}"
+        load 0
+        getbyte
+        int 122
+        <=
+        &&
+        byte "${name}"
+        load 0
+        getbyte
+        int 48
+        >=
+        byte "${name}"
+        load 0
+        getbyte
+        int 57
+        <=
+        &&
+        ||
+        assert
+        load 0
+        int 1
+        +
+        store 0
+        b main_l23
+        main_l31:
         return`
 
         return tealCode;
@@ -297,7 +414,7 @@ const Algorand = {
         program = new Uint8Array(Buffer.from(program.result, "base64"));
         
         const lsig = algosdk.makeLogicSig(program);
-        
+        console.log(lsig.address());
         return lsig;
         
     },
