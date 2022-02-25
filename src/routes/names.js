@@ -113,6 +113,7 @@ router.get('/:name', async function(req, res){
     let name = req.params.name;
     const params = req.query;
     name = name.split('.algo')[0];
+    name = name.toLowerCase();
     
     if(Object.keys(params).length === 0) {
         let result;
