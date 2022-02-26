@@ -13,6 +13,7 @@ let nameInfo = {
     totalTransactions: 0,
     lastTenRegistrations: []
 };
+const TTL = 5; //in minutes
 
 router.get('/insights', async function(req, res){
 
@@ -118,11 +119,33 @@ router.get('/:name', async function(req, res){
     if(Object.keys(params).length === 0) {
         let result;
         if(cachedResponses[name] !== undefined) {
-            res.status(200).json({found: true, address: cachedResponses[name]})
+            let now = new Date();
+            let cachedTime = new Date(cachedResponses[name].time);
+            if(new Date(cachedTime.setMinutes(cachedTime.getMinutes()+TTL))>now) 
+            res.status(200).json({found: true, address: cachedResponses[name].address});
+            else {
+                
+                let nameInfo; 
+                nameInfo = await helper.searchForName(name);
+                let result; 
+                result = {
+                    found:nameInfo.found, 
+                    address:nameInfo.address
+                }
+                cachedResponses[name] = {
+                    address: result.address,
+                    time: new Date()
+                }
+                res.status(200).json(result);
+            }
         } else {
             result = await helper.getAddress(name);
             if(result.found) {            
-                cachedResponses[name] = result.address;
+                
+                cachedResponses[name] = {
+                    address: result.address,
+                    time : new Date()
+                }
                 res.status(200).json(result);
             }
             else {
