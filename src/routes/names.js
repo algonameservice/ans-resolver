@@ -1,6 +1,11 @@
 const { default: algosdk } = require('algosdk');
 const express = require('express');
 const router = express.Router();
+const NodeCache = require('node-cache');
+const namesCache = new NodeCache({
+    stdTTL: 60*5,
+    deleteOnExpire: true
+});
 
 const helper = require('../helper/Algorand.js');
 
@@ -13,7 +18,6 @@ let nameInfo = {
     totalTransactions: 0,
     lastTenRegistrations: []
 };
-const TTL = 5; //in minutes
 
 router.get('/insights', async function(req, res){
 
@@ -85,7 +89,7 @@ router.get('/insights', async function(req, res){
                         nameRegistered: Buffer.from(args[1], 'base64').toString(),
                         period: numberStr
                     };
-                    console.log(name.nameRegistered);
+                    
                     nameInfo.lastTenRegistrations.push(name);
                     count++;
                     
@@ -95,7 +99,6 @@ router.get('/insights', async function(req, res){
             } 
         } catch (err) {
             console.log(err);
-            console.log(nameInfo.transactions[i]);
         }
         
     }
@@ -118,40 +121,27 @@ router.get('/:name', async function(req, res){
     
     if(Object.keys(params).length === 0) {
         let result;
-        if(cachedResponses[name] !== undefined) {
-            let now = new Date();
-            let cachedTime = new Date(cachedResponses[name].time);
-            if(new Date(cachedTime.setMinutes(cachedTime.getMinutes()+TTL))>now) 
-            res.status(200).json({found: true, address: cachedResponses[name].address});
-            else {
-                
-                let nameInfo; 
-                nameInfo = await helper.searchForName(name);
-                let result; 
-                result = {
-                    found:nameInfo.found, 
-                    address:nameInfo.address
-                }
-                cachedResponses[name] = {
-                    address: result.address,
-                    time: new Date()
-                }
-                res.status(200).json(result);
-            }
-        } else {
+        result = namesCache.get(name);
+        
+        if(result === undefined) {
             result = await helper.getAddress(name);
             if(result.found) {            
                 
-                cachedResponses[name] = {
+                let nameObject = {
                     address: result.address,
                     time : new Date()
-                }
+                };
+                namesCache.set(name, nameObject);
                 res.status(200).json(result);
             }
             else {
                 res.status(404).json(result);
             }
         }
+        else {
+            res.status(200).json({found:true, address: result.address});
+        }
+        
     }
     
     else {
