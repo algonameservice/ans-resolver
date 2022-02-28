@@ -9,14 +9,18 @@ const namesCache = new NodeCache({
 
 const helper = require('../helper/Algorand.js');
 
-let cachedResponses = {};
+let addresses = {
+
+};
+
 let nameInfo = {
     transactions: [],
     nameRegistrations: 0,
     nameTransfers: 0,
     latestPullTimestamp: '',
     totalTransactions: 0,
-    lastTenRegistrations: []
+    lastTenRegistrations: [],
+    nameRenewals: 0
 };
 
 router.get('/insights', async function(req, res){
@@ -24,24 +28,34 @@ router.get('/insights', async function(req, res){
     let info;
     if(nameInfo.transactions.length === 0) {
         info = await helper.lookupApplication();
-        nameInfo.transactions = info.slice(0,50);
         nameInfo.totalTransactions = info.length;
+        
+        nameInfo.transactions = info.slice(0,50);
         nameInfo.latestPullTimestamp = new Date();
         
         for(let i=0; i<info.length; i++) {
+            
             let args = info[i]["application-transaction"]["application-args"];
             
             if(args.length > 0) {
                 if(Buffer.from(args[0], 'base64').toString() === 'register_name'){
                     nameInfo.nameRegistrations++;
+                    if(addresses[info[i].sender] !== undefined) addresses[info[i].sender]++;
+                    else addresses[info[i].sender] = 1;
                 } else if(Buffer.from(args[0], 'base64').toString() === 'accept_transfer') {
                     nameInfo.nameTransfers++;
+                    if(addresses[info[i].sender] !== undefined) addresses[info[i].sender]++;
+                    else addresses[info[i].sender] = 1;
+                }
+                else if(Buffer.from(args[0], 'base64').toString() === 'renew_name') {
+                    nameInfo.nameRenewals++;
                 }
             } 
         }
         
     } else {
         info = await helper.lookupApplication(nameInfo.latestPullTimestamp);
+        nameInfo.totalTransactions += info.length;
         
         for(let i=0; i<info.length; i++) {
             let args = info[i]["application-transaction"]["application-args"];
@@ -49,8 +63,14 @@ router.get('/insights', async function(req, res){
             if(args.length > 0) {
                 if(Buffer.from(args[0], 'base64').toString() === 'register_name'){
                     nameInfo.nameRegistrations++;
+                    if(addresses[info[i].sender] !== undefined) addresses[info[i].sender]++;
+                    else addresses[info[i].sender] = 1;
                 } else if(Buffer.from(args[0], 'base64').toString() === 'accept_transfer') {
                     nameInfo.nameTransfers++;
+                    if(addresses[info[i].sender] !== undefined) addresses[info[i].sender]++;
+                    else addresses[info[i].sender] = 1;
+                } else if(Buffer.from(args[0], 'base64').toString() === 'renew_name') {
+                    nameInfo.nameRenewals++;
                 }
             } 
         }
@@ -92,9 +112,14 @@ router.get('/insights', async function(req, res){
                     
                     nameInfo.lastTenRegistrations.push(name);
                     count++;
+
+                    
                     
                 } else if(Buffer.from(args[0], 'base64').toString() === 'accept_transfer') {
-                    //nameInfo.nameTransfers++;
+                    nameInfo.nameTransfers++;
+                }
+                else if(Buffer.from(args[0], 'base64').toString() === 'renew_name') {
+                    nameInfo.nameRenewals++;
                 }
             } 
         } catch (err) {
@@ -105,9 +130,11 @@ router.get('/insights', async function(req, res){
 
     res.status(200).json({
         totalNameRegistrations: nameInfo.nameRegistrations,
-        totalTransactions: nameInfo.transactions.length, 
+        totalTransactions: nameInfo.totalTransactions, 
         totalNameTransfers: nameInfo.nameTransfers,
-        lastTenRegistrations: nameInfo.lastTenRegistrations
+        lastTenRegistrations: nameInfo.lastTenRegistrations,
+        addresses: addresses,
+        totalRenewals: nameInfo.nameRenewals
     });
     
 });
@@ -200,7 +227,12 @@ router.get('/:name', async function(req, res){
         }
 
         if(nameInfo.found) {            
-            cachedResponses[name] = result.address;
+            
+            let nameObject = {
+                address: result.address,
+                time : new Date()
+            };
+            namesCache.set(name, nameObject);
             res.status(200).json(result);
         }
         else {

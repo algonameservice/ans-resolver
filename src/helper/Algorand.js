@@ -414,7 +414,7 @@ const Algorand = {
         program = new Uint8Array(Buffer.from(program.result, "base64"));
         
         const lsig = algosdk.makeLogicSig(program);
-        console.log(lsig.address());
+        
         return lsig;
         
     },
@@ -728,10 +728,34 @@ const Algorand = {
     },
 
     lookupTransactionsByAddress : async (account, socials, metadata) => {
-        
-        const accountTxns = await indexer.lookupAccountTransactions(account).do();
 
-        const txns = accountTxns.transactions;
+        let nextToken = '';
+        let txnLength = 1;
+        let txns = [];
+        let count=0;
+        while(txnLength > 0){
+            try{
+                let info = await indexer.lookupAccountTransactions(account).
+                limit(10000).
+                nextToken(nextToken).do();
+                txnLength=info.transactions.length;
+                if(txnLength > 0) {
+                    count++;
+                    nextToken = info["next-token"];
+                    txns.push(info.transactions);
+                }
+                
+            }catch(err){
+                return false;
+            }
+        }
+
+        let accountTxns = [];
+        for(let i=0; i<txns.length; i++){
+            accountTxns=accountTxns.concat(txns[i]);
+        }
+      
+        txns = accountTxns;
         
         const names = [];
         
@@ -739,7 +763,7 @@ const Algorand = {
      
             for(let i=0; i<txns.length; i++) {
                 let txn= txns[i];
-
+                
                 if(txn["tx-type"] === "appl") {
                     
                     if(txn["application-transaction"]["application-id"] === parseInt(parseInt(process.env.APP_ID))) {
