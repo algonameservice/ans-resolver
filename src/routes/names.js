@@ -23,6 +23,8 @@ let nameInfo = {
     nameRenewals: 0
 };
 
+let LOCK = false;
+
 router.get('/insights', async function(req, res){
 
     let info;
@@ -32,6 +34,7 @@ router.get('/insights', async function(req, res){
         
         nameInfo.transactions = info.slice(0,50);
         nameInfo.latestPullTimestamp = new Date();
+        
         
         for(let i=0; i<info.length; i++) {
             
@@ -54,33 +57,49 @@ router.get('/insights', async function(req, res){
         }
         
     } else {
-        info = await helper.lookupApplication(nameInfo.latestPullTimestamp);
-        nameInfo.totalTransactions += info.length;
+        if(!LOCK){
+            LOCK = true;
+            info = await helper.lookupApplication(nameInfo.latestPullTimestamp);
+            nameInfo.totalTransactions += info.length;
+            
+            for(let i=0; i<info.length; i++) {
+                let args = info[i]["application-transaction"]["application-args"];
+                
+                if(args.length > 0) {
+                    if(Buffer.from(args[0], 'base64').toString() === 'register_name'){
+                        
+                        nameInfo.nameRegistrations++;
+                        
+                        if(addresses[info[i].sender] !== undefined) addresses[info[i].sender]++;
+                        else addresses[info[i].sender] = 1;
+                       
+                        
+                    } else if(Buffer.from(args[0], 'base64').toString() === 'accept_transfer') {
+                        
+                        nameInfo.nameTransfers++;
+                        
+                        if(addresses[info[i].sender] !== undefined) addresses[info[i].sender]++;
+                        else addresses[info[i].sender] = 1;
+                        
+                        
+                    } else if(Buffer.from(args[0], 'base64').toString() === 'renew_name') {
+                        
+                        nameInfo.nameRenewals++;
+                            
+                        
+                    }
+                } 
+            }
+            if(info.length > 0) {
+                nameInfo.latestPullTimestamp = new Date();
+                nameInfo.transactions = nameInfo.transactions.reverse();
+                nameInfo.transactions = nameInfo.transactions.concat(info.reverse());
+                nameInfo.transactions = nameInfo.transactions.reverse();
+                
+            }
+            LOCK = false;
+        }
         
-        for(let i=0; i<info.length; i++) {
-            let args = info[i]["application-transaction"]["application-args"];
-            
-            if(args.length > 0) {
-                if(Buffer.from(args[0], 'base64').toString() === 'register_name'){
-                    nameInfo.nameRegistrations++;
-                    if(addresses[info[i].sender] !== undefined) addresses[info[i].sender]++;
-                    else addresses[info[i].sender] = 1;
-                } else if(Buffer.from(args[0], 'base64').toString() === 'accept_transfer') {
-                    nameInfo.nameTransfers++;
-                    if(addresses[info[i].sender] !== undefined) addresses[info[i].sender]++;
-                    else addresses[info[i].sender] = 1;
-                } else if(Buffer.from(args[0], 'base64').toString() === 'renew_name') {
-                    nameInfo.nameRenewals++;
-                }
-            } 
-        }
-        if(info.length > 0) {
-            nameInfo.latestPullTimestamp = new Date();
-            nameInfo.transactions = nameInfo.transactions.reverse();
-            nameInfo.transactions = nameInfo.transactions.concat(info.reverse());
-            nameInfo.transactions = nameInfo.transactions.reverse();
-            
-        }
         
     }
 
