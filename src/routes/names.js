@@ -2,12 +2,12 @@ const { default: algosdk } = require('algosdk');
 const express = require('express');
 const router = express.Router();
 const NodeCache = require('node-cache');
+const helper = require('../helper/Algorand.js');
+const { Worker } = require('worker_threads')
 const namesCache = new NodeCache({
     stdTTL: 60*5,
     deleteOnExpire: true
 });
-
-const helper = require('../helper/Algorand.js');
 
 let addresses = {
 
@@ -162,105 +162,33 @@ router.get('/:name', async function(req, res){
 
     let name = req.params.name;
     const params = req.query;
+
+
     name = name.split('.algo')[0];
     name = name.toLowerCase();
     
-    if(Object.keys(params).length === 0) {
-        let result;
-        result = namesCache.get(name);
-        
-        if(result === undefined) {
-            result = await helper.getAddress(name);
-            if(result.found) {            
-                
-                let nameObject = {
-                    address: result.address,
-                    time : new Date()
-                };
-                namesCache.set(name, nameObject);
-                res.status(200).json(result);
-            }
-            else {
-                res.status(404).json(result);
-            }
-        }
-        else {
-            res.status(200).json({found:true, address: result.address});
-        }
-        
-    }
+    let cachedResult = namesCache.get(name);
     
-    else {
+    if(cachedResult === undefined || Object.keys(params).length !== 0){
         
-        let nameInfo; 
-        nameInfo = await helper.searchForName(name);
-        let result; 
-        result = {
-            found:nameInfo.found, 
-            address:nameInfo.address
-        }
-        if(params.socials === 'true' && params.metadata === 'true') {
-            result["socials"]= nameInfo.socials;
-            result["metadata"] = nameInfo.data;
-        }
-        else if(params.socials === 'true') {
-            result["socials"]= nameInfo.socials;
-        }
-        else if (params.metadata === 'true') {
-            result["metadata"] = nameInfo.data;
-        }
-        else if (Object.keys(params).length === 1) {
-            const keyToFind = Object.keys(params)[0];
-            let found = false;
-            let value;
-            
-            for(let key in nameInfo.socials) {
-                let record = nameInfo.socials[key];
-                if(record.key === keyToFind) {
-                    found=true;
-                    value=record.value;
-                    
-                    break;
-                }
-            }
-            if(!found) {
-                for(let key in nameInfo.data) {
-                    let record = nameInfo.data[key];
-                    if(record.key === keyToFind) {
-                        found=true;
-                        value=record.value;
-                        break;
-                    }
-                }
-            }
-
-            if(found) {
-                result[keyToFind] = value;
-            } else {
-                result[keyToFind] = 'Property not found';
-            }
-            
-        }
-        else {
-            result = await helper.getAddress(name);
-        }
-
-        if(nameInfo.found) {            
-            
+        const seprateThread = new Worker("./src/helper/resolveNameThread.js");
+        seprateThread.on("message", (response) => {
             let nameObject = {
-                address: result.address,
-                time : new Date()
-            };
+                address: response.result.address,
+                time: new Date()
+            }
             namesCache.set(name, nameObject);
-            res.status(200).json(result);
-        }
-        else {
-            res.status(404).json(result);
-        }
+            res.status(response.status).json(response.result);
+        });
+        seprateThread.postMessage({
+            name: name,
+            params: params
+        });
+    } else {
+        res.status(200).json({found:true, address: cachedResult.address});
     }
-
     
-  
+
 })
 
 router.post('/register/txns', async function(req, res){
