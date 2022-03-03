@@ -3,7 +3,13 @@ const express = require('express');
 const router = express.Router();
 const NodeCache = require('node-cache');
 const helper = require('../helper/Algorand.js');
-const { Worker } = require('worker_threads')
+const path = require('path');
+
+const Piscina = require('piscina');
+const piscina = new Piscina({
+  filename: path.resolve(__dirname, '../helper/resolveNameThread.js')
+});
+
 const namesCache = new NodeCache({
     stdTTL: 60*5,
     deleteOnExpire: true
@@ -170,20 +176,17 @@ router.get('/:name', async function(req, res){
     let cachedResult = namesCache.get(name);
     
     if(cachedResult === undefined || Object.keys(params).length !== 0){
-        
-        const seprateThread = new Worker("./src/helper/resolveNameThread.js");
-        seprateThread.on("message", (response) => {
+        const response = await piscina.run(name, params);
+        if(response.result.found){
             let nameObject = {
                 address: response.result.address,
                 time: new Date()
             }
             namesCache.set(name, nameObject);
             res.status(response.status).json(response.result);
-        });
-        seprateThread.postMessage({
-            name: name,
-            params: params
-        });
+        }
+        else res.status(response.status).json(response.result);
+
     } else {
         res.status(200).json({found:true, address: cachedResult.address});
     }

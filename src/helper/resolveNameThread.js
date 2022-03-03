@@ -1,6 +1,5 @@
-const { parentPort } = require("worker_threads");
-const helper = require('./Algorand');
 
+const helper = require('./Algorand');
 
 const resolveName = async (name, params) => {
     
@@ -91,8 +90,4 @@ const resolveName = async (name, params) => {
     
 };
 
-parentPort.on("message", async (request) => {
-    
-    const result = await resolveName(request.name, request.params);
-    parentPort.postMessage(result);
-});
+module.exports = resolveName;
