@@ -35,10 +35,14 @@ router.get('/insights', async function(req, res){
 
     let info;
     if(nameInfo.transactions.length === 0) {
+
         info = await helper.lookupApplication();
         nameInfo.totalTransactions = info.length;
-        
-        nameInfo.transactions = info.slice(0,50);
+        console.log(typeof(info));
+        if(typeof(info) == 'boolean') {
+            console.log(info);
+        } 
+        nameInfo.transactions = info;
         nameInfo.latestPullTimestamp = new Date();
         
         
@@ -61,6 +65,8 @@ router.get('/insights', async function(req, res){
                 }
             } 
         }
+            
+        
         
     } else {
         if(!LOCK){

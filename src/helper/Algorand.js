@@ -5,8 +5,8 @@ const client = new algosdk.Algodv2({ 'X-API-KEY': process.env.PURESTAKE_API_KEY 
             process.env.PURESTAKE_CLIENT_URL,
             '');
 
-            /*
-const indexer = new algosdk.Indexer({ 'X-API-KEY': process.env.PURESTAKE_API_KEY },
+
+/*const indexer = new algosdk.Indexer({ 'X-API-KEY': process.env.PURESTAKE_API_KEY },
             process.env.PURESTAKE_INDEXER_URL,
             '');  */
 
@@ -700,20 +700,24 @@ const Algorand = {
         let txnLength = 1;
         let txns = [];
         let count=0;
+        
         while(txnLength > 0){
             try{
-                let info = await indexer.searchForTransactions().applicationID(process.env.APP_ID).
+                let info = await indexer.searchForTransactions().applicationID(process.env.APP_ID || 628095415).
                 limit(10000).
                 nextToken(nextToken).
                 afterTime(timestamp).do();
                 txnLength=info.transactions.length;
+                
                 if(txnLength > 0) {
                     count++;
                     nextToken = info["next-token"];
                     txns.push(info.transactions);
                 }
                 
+                
             }catch(err){
+                console.log(err);
                 return false;
             }
         }
@@ -727,7 +731,7 @@ const Algorand = {
         
     },
 
-    lookupTransactionsByAddress : async (account, socials, metadata) => {
+    lookupTransactionsByAddress : async (account, socials, metadata, limit) => {
 
         let nextToken = '';
         let txnLength = 1;
@@ -737,6 +741,7 @@ const Algorand = {
             try{
                 let info = await indexer.lookupAccountTransactions(account).
                 limit(10000).
+                afterTime('2022-02-25').
                 nextToken(nextToken).do();
                 txnLength=info.transactions.length;
                 if(txnLength > 0) {
@@ -756,7 +761,6 @@ const Algorand = {
         }
       
         txns = accountTxns;
-        
         const names = [];
         
         try{
@@ -809,6 +813,10 @@ const Algorand = {
 
             let details=[];
             for(let i=0; i<names.length; i++) {
+                
+                if(limit !== undefined) {
+                    if(details.length >= limit) break;
+                }
                 let info = await Algorand.searchForName(names[i]);
                 let data={
                     socials: {},
@@ -822,9 +830,8 @@ const Algorand = {
                 if(info.found && info.address !== undefined) {
 
                     if(info.address === account){
+
                         let kvPairs = info.socials;
-                        
-                        
                         if(kvPairs.length > 0) {
                             for(let j=0; j<kvPairs.length; j++) {
                                 if(kvPairs[j].key === 'expiry') {
