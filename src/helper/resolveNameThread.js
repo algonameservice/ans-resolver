@@ -16,8 +16,7 @@ const resolveName = async (name, params) => {
         else {
             nameInfo.status = 400;
             nameInfo.result = result;
-        }
-      
+        } 
     }
     
     else {
