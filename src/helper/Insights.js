@@ -1,5 +1,6 @@
 const helper = require('./Algorand');
 const NodeCache = require('node-cache');
+const fs = require('fs');
 
 const insightsCache = new NodeCache();
 
@@ -36,35 +37,14 @@ class Insights {
         let cacheObject = {};
         
         if(insightsInfo == undefined) {
-
-            info = await helper.lookupApplication();
-            if(info === false) return false;
-            cacheObject.totalTransactions = info.length;
-            cacheObject.transactions = info.slice(0,50);
-            cacheObject.latestPullTimestamp = new Date();
-            
-            cacheObject.nameRegistrations = 0;
-            cacheObject.nameTransfers = 0;
-            cacheObject.nameRenewals = 0;
-            
-         
-            for(let i=0; i<info.length; i++) {
-                let args = info[i]["application-transaction"]["application-args"];
-                if(args.length > 0) {
-                    if(Buffer.from(args[0], 'base64').toString() === 'register_name'){
-                        cacheObject.nameRegistrations++;
-                        if(this.addresses[info[i].sender] !== undefined) this.addresses[info[i].sender]++;
-                        else this.addresses[info[i].sender] = 1;
-                    } else if(Buffer.from(args[0], 'base64').toString() === 'accept_transfer') {
-                        cacheObject.nameTransfers++;
-                        if(this.addresses[info[i].sender] !== undefined) this.addresses[info[i].sender]++;
-                        else this.addresses[info[i].sender] = 1;
-                    }
-                    else if(Buffer.from(args[0], 'base64').toString() === 'renew_name') {
-                        cacheObject.nameRenewals++;
-                    }
-                } 
-            }
+            let data = fs.readFileSync('./src/data/data.json', 'utf-8');
+            data = JSON.parse(data);
+            cacheObject.transactions = data.transactions;
+            cacheObject.totalTransactions = data.totalTransactions;
+            cacheObject.nameRegistrations = data.nameRegistrations;
+            cacheObject.nameTransfers = data.nameTransfers;
+            cacheObject.nameRenewals = data.nameRenewals;
+            cacheObject.latestPullTimestamp = data.timestamp;
             
         } else {
             
@@ -102,6 +82,7 @@ class Insights {
                 cacheObject.transactions = cacheObject.transactions.reverse();
                 cacheObject.transactions = cacheObject.transactions.concat(info.reverse());
                 cacheObject.transactions = cacheObject.transactions.reverse();
+                cacheObject.transactions = cacheObject.transactions.slice(0,50);
             }
                
         }
@@ -133,12 +114,15 @@ class Insights {
                         
                         cacheObject.lastTenRegistrations.push(name);
                         count++;
+                        
 
                     } else if(Buffer.from(args[0], 'base64').toString() === 'accept_transfer') {
-                        cacheObject.nameTransfers++;
+                        //TODO: Add to accept transfer array in the future
+                        //cacheObject.nameTransfers++;
                     }
                     else if(Buffer.from(args[0], 'base64').toString() === 'renew_name') {
-                        cacheObject.nameRenewals++;
+                        //TODO: Add to accept renew name array in the future
+                        //cacheObject.nameRenewals++;
                     }
                 } 
             } catch (err) {
@@ -155,7 +139,6 @@ class Insights {
 
         insightsCache.set("insights", cacheObject);
         
-
     }
 
     getInsights = async () => {
