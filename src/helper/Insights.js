@@ -1,9 +1,12 @@
 const helper = require('./Algorand');
+const NodeCache = require('node-cache');
+const fs = require('fs');
 
-let Insights = (function () {
-    let instance;
-    let LOCK = false;
-    let nameInfo = {
+const insightsCache = new NodeCache();
+
+class Insights {
+    
+    nameInfo = {
         transactions: [],
         nameRegistrations: 0,
         nameTransfers: 0,
@@ -12,106 +15,88 @@ let Insights = (function () {
         lastTenRegistrations: [],
         nameRenewals: 0
     };
-    let addresses = {
+
+    addresses = {
 
     };
 
+    LOCK = false;
 
-    function createInstance() {
-        let object = new Object();
-        return object;
+    constructor () {
+        if(! Insights.instance) {
+            Insights.instance = this;
+        }
+
+        return Insights.instance;
     }
 
-    async function loadInsights(){
-
+    loadInsights = async () => {
+       
         let info;
+        const insightsInfo = insightsCache.get("insights");
+        let cacheObject = {};
         
-        if(nameInfo.transactions.length === 0) {
+        if(insightsInfo == undefined) {
+            let data = fs.readFileSync('./src/data/data.json', 'utf-8');
+            data = JSON.parse(data);
+            cacheObject.transactions = data.transactions;
+            cacheObject.totalTransactions = data.totalTransactions;
+            cacheObject.nameRegistrations = data.nameRegistrations;
+            cacheObject.nameTransfers = data.nameTransfers;
+            cacheObject.nameRenewals = data.nameRenewals;
+            cacheObject.latestPullTimestamp = data.timestamp;
             
-            info = await helper.lookupApplication();
-            nameInfo.totalTransactions = info.length;
+        } else {
             
-            nameInfo.transactions = info.slice(0,50);
-            nameInfo.latestPullTimestamp = new Date();
-         
+            cacheObject = {...insightsInfo};
+            info = await helper.lookupApplication(cacheObject.latestPullTimestamp);
+            cacheObject.totalTransactions += info.length;
+            
             for(let i=0; i<info.length; i++) {
-                
                 let args = info[i]["application-transaction"]["application-args"];
                 
                 if(args.length > 0) {
                     if(Buffer.from(args[0], 'base64').toString() === 'register_name'){
-                        nameInfo.nameRegistrations++;
-                        if(addresses[info[i].sender] !== undefined) addresses[info[i].sender]++;
-                        else addresses[info[i].sender] = 1;
+                        
+                        cacheObject.nameRegistrations++;
+                        
+                        if(this.addresses[info[i].sender] !== undefined) this.addresses[info[i].sender]++;
+                        else this.addresses[info[i].sender] = 1;
+                    
+                        
                     } else if(Buffer.from(args[0], 'base64').toString() === 'accept_transfer') {
-                        nameInfo.nameTransfers++;
-                        if(addresses[info[i].sender] !== undefined) addresses[info[i].sender]++;
-                        else addresses[info[i].sender] = 1;
-                    }
-                    else if(Buffer.from(args[0], 'base64').toString() === 'renew_name') {
-                        nameInfo.nameRenewals++;
+                        
+                        cacheObject.nameTransfers++;
+                        
+                        if(this.addresses[info[i].sender] !== undefined) this.addresses[info[i].sender]++;
+                        else this.addresses[info[i].sender] = 1;
+                        
+                        
+                    } else if(Buffer.from(args[0], 'base64').toString() === 'renew_name') {
+                        cacheObject.nameRenewals++;
                     }
                 } 
             }
-            
-        } else {
-            if(!LOCK){
-                LOCK = true;
-                info = await helper.lookupApplication(nameInfo.latestPullTimestamp);
-                nameInfo.totalTransactions += info.length;
-                
-                for(let i=0; i<info.length; i++) {
-                    let args = info[i]["application-transaction"]["application-args"];
-                    
-                    if(args.length > 0) {
-                        if(Buffer.from(args[0], 'base64').toString() === 'register_name'){
-                            
-                            nameInfo.nameRegistrations++;
-                            
-                            if(addresses[info[i].sender] !== undefined) addresses[info[i].sender]++;
-                            else addresses[info[i].sender] = 1;
-                        
-                            
-                        } else if(Buffer.from(args[0], 'base64').toString() === 'accept_transfer') {
-                            
-                            nameInfo.nameTransfers++;
-                            
-                            if(addresses[info[i].sender] !== undefined) addresses[info[i].sender]++;
-                            else addresses[info[i].sender] = 1;
-                            
-                            
-                        } else if(Buffer.from(args[0], 'base64').toString() === 'renew_name') {
-                            
-                            nameInfo.nameRenewals++;
-                                
-                            
-                        }
-                    } 
-                }
-                if(info.length > 0) {
-                    nameInfo.latestPullTimestamp = new Date();
-                    nameInfo.transactions = nameInfo.transactions.reverse();
-                    nameInfo.transactions = nameInfo.transactions.concat(info.reverse());
-                    nameInfo.transactions = nameInfo.transactions.reverse();
-                    
-                }
-                LOCK = false;
+            if(info.length > 0) {
+                cacheObject.latestPullTimestamp = new Date();
+                cacheObject.transactions = cacheObject.transactions.reverse();
+                cacheObject.transactions = cacheObject.transactions.concat(info.reverse());
+                cacheObject.transactions = cacheObject.transactions.reverse();
+                cacheObject.transactions = cacheObject.transactions.slice(0,50);
             }
-            
-            
+               
         }
 
         let count = 0;
         let hex;
         let numberStr='';
-        nameInfo.lastTenRegistrations = [];
+        cacheObject.lastTenRegistrations = [];
         
-        
-        for(let i=0; i<nameInfo.transactions.length && count < 10; i++) {
+        for(let i=0; i<cacheObject.transactions.length && count < 10; i++) {
             try{
                 
-                let args = nameInfo.transactions[i]["application-transaction"]["application-args"];
-                let sender = nameInfo.transactions[i]["sender"];
+                let args = cacheObject.transactions[i]["application-transaction"]["application-args"];
+                let sender = cacheObject.transactions[i]["sender"];
                 numberStr = '';
                 if(args.length > 0) {
                     if(Buffer.from(args[0], 'base64').toString() === 'register_name'){
@@ -127,53 +112,77 @@ let Insights = (function () {
                             period: numberStr
                         };
                         
-                        nameInfo.lastTenRegistrations.push(name);
+                        cacheObject.lastTenRegistrations.push(name);
                         count++;
+                        
 
-                        
-                        
                     } else if(Buffer.from(args[0], 'base64').toString() === 'accept_transfer') {
-                        nameInfo.nameTransfers++;
+                        //TODO: Add to accept transfer array in the future
+                        //cacheObject.nameTransfers++;
                     }
                     else if(Buffer.from(args[0], 'base64').toString() === 'renew_name') {
-                        nameInfo.nameRenewals++;
+                        //TODO: Add to accept renew name array in the future
+                        //cacheObject.nameRenewals++;
                     }
                 } 
             } catch (err) {
-                console.log(err);
+                console.log("err");
             }
             
         }
 
-        return ({
-            totalNameRegistrations: nameInfo.nameRegistrations,
-            totalTransactions: nameInfo.totalTransactions, 
-            totalNameTransfers: nameInfo.nameTransfers,
-            lastTenRegistrations: nameInfo.lastTenRegistrations,
-            addresses: addresses,
-            totalRenewals: nameInfo.nameRenewals
-        })
+        let maxNamesOwnedByAddress = 0;
+        for(let i in this.addresses) {
+            if(this.addresses[i] > maxNamesOwnedByAddress) maxNamesOwnedByAddress = this.addresses[i];
+        }
+        cacheObject.maxNamesOwnedByAddress = maxNamesOwnedByAddress;
 
+        insightsCache.set("insights", cacheObject);
+        
     }
 
-    return {
-        getInstance: function () {
-            if (!instance) {
-                instance = createInstance();
+    getInsights = async () => {
+        try{
+            if(!this.LOCK){
+                this.LOCK = true;
+                const insights = await this.loadInsights();
+                this.LOCK = false;
+                const insightsInfo = insightsCache.get("insights");
+                if(insightsInfo !== undefined) {
+                    return ({
+                        totalNameRegistrations : insightsInfo.nameRegistrations,
+                        totalTransactions:insightsInfo.totalTransactions,
+                        totalNameTransfers: insightsInfo.nameTransfers,
+                        totalRenewals:insightsInfo.nameRenewals,
+                        lastTenRegistrations: insightsInfo.lastTenRegistrations,
+                        maxNamesOwnedByAddress: insightsInfo.maxNamesOwnedByAddress
+                    });
+                } else {
+                    return false;
+                }
+            } else {
+                const insightsInfo = insightsCache.get("insights");
+                if(insightsInfo !== undefined) {
+                    return ({
+                        totalNameRegistrations : insightsInfo.nameRegistrations,
+                        totalTransactions:insightsInfo.totalTransactions,
+                        totalNameTransfers: insightsInfo.nameTransfers,
+                        totalRenewals:insightsInfo.nameRenewals,
+                        lastTenRegistrations: insightsInfo.lastTenRegistrations,
+                        maxNamesOwnedByAddress: insightsInfo.maxNamesOwnedByAddress
+                    });
+                } else {
+                    return false;
+                }
             }
-            return instance;
-        },
-        getInsights: async function (){
-            let info = await loadInsights();
-            return info;
+        } catch (err) {
+
+        } finally {
+            this.LOCK = false;
         }
-    };
-})();
-
-async function run(){
-
-    let info = await Insights.getInsights();
-    
+        
+        
+    }
 }
 
-run();
+module.exports = Insights;

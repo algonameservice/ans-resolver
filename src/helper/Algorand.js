@@ -717,7 +717,6 @@ const Algorand = {
                 
                 
             }catch(err){
-                console.log(err);
                 return false;
             }
         }
