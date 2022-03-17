@@ -10,7 +10,7 @@ const client = new algosdk.Algodv2({ 'X-API-KEY': process.env.PURESTAKE_API_KEY 
             process.env.PURESTAKE_INDEXER_URL,
             '');  */
 
-const indexer = new algosdk.Indexer('','https://algoexplorerapi.io/idx2','');          
+const indexer = new algosdk.Indexer('','https://algoindexer.algoexplorerapi.io','');          
 
 const Algorand = {
 
