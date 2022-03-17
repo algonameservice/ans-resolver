@@ -1,7 +1,7 @@
 
 const helper = require('./Algorand');
 
-const resolveName = async (name, params) => {
+const resolveName = async ({name, params}) => {
     
     let nameInfo = {};
     

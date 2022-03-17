@@ -36,7 +36,11 @@ router.get('/:name', async function(req, res){
     let cachedResult = namesCache.get(name);
     
     if(cachedResult === undefined || Object.keys(params).length !== 0){
-        const response = await piscina.run(name, params);
+        
+        const response = await piscina.run({
+            name: name,
+            params: params
+        });
         if(response.result.found){
             let nameObject = {
                 address: response.result.address,
