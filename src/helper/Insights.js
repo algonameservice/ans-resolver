@@ -90,6 +90,7 @@ class Insights {
             let latestData = await this.loadTransactionsAfterTimestamp(data.timestamp, cacheObject);
             cacheObject = {...latestData};
 
+            /*
             let updatedJsonObject = {
                 transactions: cacheObject.transactions,
                 totalTransactions: cacheObject.totalTransactions,
@@ -99,12 +100,13 @@ class Insights {
                 timestamp: new Date(),
                 maxNamesOwnedByAddress: cacheObject.maxNamesOwnedByAddress
             }
-
+            
             try{
                 fs.writeFileSync('./src/data/data.json', JSON.stringify(updatedJsonObject));
             } catch (err) {
                 return false;
             }
+            */
             
         } else {
             cacheObject = {...insightsInfo};
