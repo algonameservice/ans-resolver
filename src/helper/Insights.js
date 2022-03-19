@@ -30,6 +30,46 @@ class Insights {
         return Insights.instance;
     }
 
+    loadTransactionsAfterTimestamp = async (timestamp, cacheObject) => {
+        
+        let info = await helper.lookupApplication(timestamp);
+        for(let i=0; i<info.length; i++) {
+            let args = info[i]["application-transaction"]["application-args"];
+            
+            if(args.length > 0) {
+                if(Buffer.from(args[0], 'base64').toString() === 'register_name'){
+                    
+                    cacheObject.nameRegistrations++;
+                    
+                    if(this.addresses[info[i].sender] !== undefined) this.addresses[info[i].sender]++;
+                    else this.addresses[info[i].sender] = 1;
+                
+                    
+                } else if(Buffer.from(args[0], 'base64').toString() === 'accept_transfer') {
+                    
+                    cacheObject.nameTransfers++;
+                    
+                    if(this.addresses[info[i].sender] !== undefined) this.addresses[info[i].sender]++;
+                    else this.addresses[info[i].sender] = 1;
+                    
+                    
+                } else if(Buffer.from(args[0], 'base64').toString() === 'renew_name') {
+                    cacheObject.nameRenewals++;
+                }
+            } 
+        }
+        if(info.length > 0) {
+            cacheObject.latestPullTimestamp = new Date();
+            cacheObject.transactions = cacheObject.transactions.reverse();
+            cacheObject.transactions = cacheObject.transactions.concat(info.reverse());
+            cacheObject.transactions = cacheObject.transactions.reverse();
+            cacheObject.transactions = cacheObject.transactions.slice(0,50);
+        }
+
+        return cacheObject;
+
+    }
+
     loadInsights = async () => {
        
         let info;
@@ -45,46 +85,34 @@ class Insights {
             cacheObject.nameTransfers = data.nameTransfers;
             cacheObject.nameRenewals = data.nameRenewals;
             cacheObject.latestPullTimestamp = data.timestamp;
+            cacheObject.maxNamesOwnedByAddress = data.maxNamesOwnedByAddress;
+            
+            let latestData = await this.loadTransactionsAfterTimestamp(data.timestamp, cacheObject);
+            cacheObject = {...latestData};
+
+            /*
+            let updatedJsonObject = {
+                transactions: cacheObject.transactions,
+                totalTransactions: cacheObject.totalTransactions,
+                nameRegistrations: cacheObject.nameRegistrations,
+                nameTransfers: cacheObject.nameTransfers,
+                nameRenewals: cacheObject.nameRenewals,
+                timestamp: new Date(),
+                maxNamesOwnedByAddress: cacheObject.maxNamesOwnedByAddress
+            }
+            
+            try{
+                fs.writeFileSync('./src/data/data.json', JSON.stringify(updatedJsonObject));
+            } catch (err) {
+                return false;
+            }
+            */
             
         } else {
-            
             cacheObject = {...insightsInfo};
-            info = await helper.lookupApplication(cacheObject.latestPullTimestamp);
-            cacheObject.totalTransactions += info.length;
-            
-            for(let i=0; i<info.length; i++) {
-                let args = info[i]["application-transaction"]["application-args"];
-                
-                if(args.length > 0) {
-                    if(Buffer.from(args[0], 'base64').toString() === 'register_name'){
-                        
-                        cacheObject.nameRegistrations++;
-                        
-                        if(this.addresses[info[i].sender] !== undefined) this.addresses[info[i].sender]++;
-                        else this.addresses[info[i].sender] = 1;
-                    
-                        
-                    } else if(Buffer.from(args[0], 'base64').toString() === 'accept_transfer') {
-                        
-                        cacheObject.nameTransfers++;
-                        
-                        if(this.addresses[info[i].sender] !== undefined) this.addresses[info[i].sender]++;
-                        else this.addresses[info[i].sender] = 1;
-                        
-                        
-                    } else if(Buffer.from(args[0], 'base64').toString() === 'renew_name') {
-                        cacheObject.nameRenewals++;
-                    }
-                } 
-            }
-            if(info.length > 0) {
-                cacheObject.latestPullTimestamp = new Date();
-                cacheObject.transactions = cacheObject.transactions.reverse();
-                cacheObject.transactions = cacheObject.transactions.concat(info.reverse());
-                cacheObject.transactions = cacheObject.transactions.reverse();
-                cacheObject.transactions = cacheObject.transactions.slice(0,50);
-            }
-               
+            console.log(cacheObject);
+            let latestData = await this.loadTransactionsAfterTimestamp(cacheObject.latestPullTimestamp, cacheObject);
+            cacheObject = {...latestData};
         }
 
         let count = 0;
@@ -131,7 +159,7 @@ class Insights {
             
         }
 
-        let maxNamesOwnedByAddress = 0;
+        let maxNamesOwnedByAddress = cacheObject.maxNamesOwnedByAddress;
         for(let i in this.addresses) {
             if(this.addresses[i] > maxNamesOwnedByAddress) maxNamesOwnedByAddress = this.addresses[i];
         }
