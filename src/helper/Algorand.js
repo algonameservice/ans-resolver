@@ -10,7 +10,7 @@ const client = new algosdk.Algodv2({ 'X-API-KEY': process.env.PURESTAKE_API_KEY 
             process.env.PURESTAKE_INDEXER_URL,
             '');  */
 
-const indexer = new algosdk.Indexer('','https://algoindexer.algoexplorerapi.io','');          
+const indexer = new algosdk.Indexer('','https://algoindexer.testnet.algoexplorerapi.io','');          
 
 const Algorand = {
 
@@ -64,7 +64,7 @@ const Algorand = {
         ==
         assert
         gtxn 0 Receiver
-        addr SYGCDTWGBXKV4ZL5YAWSYAVOUC25U2XDB6SMQHLRCTYVF566TQZ3EOABH4
+        addr ACFFHRILZQ6W2UDNYYTHV55YS6MZWJR4PEDVBFAL575FFK4AT4UBCO3SXE
         ==
         assert
         global GroupSize
@@ -87,7 +87,7 @@ const Algorand = {
         gtxn 2 Sender
         ==
         gtxn 2 ApplicationID
-        int 628095415
+        int 75101786
         ==
         &&
         gtxn 2 OnCompletion
@@ -95,7 +95,7 @@ const Algorand = {
         ==
         &&
         gtxn 3 ApplicationID
-        int 628095415
+        int 75101786
         ==
         &&
         gtxn 3 Sender
@@ -114,7 +114,7 @@ const Algorand = {
         b main_l9
         main_l11:
         gtxn 1 ApplicationID
-        int 628095415
+        int 75101786
         ==
         gtxna 1 ApplicationArgs 0
         byte "register_name"
@@ -187,7 +187,7 @@ const Algorand = {
         ==
         assert
         gtxn 0 Receiver
-        addr SYGCDTWGBXKV4ZL5YAWSYAVOUC25U2XDB6SMQHLRCTYVF566TQZ3EOABH4
+        addr ACFFHRILZQ6W2UDNYYTHV55YS6MZWJR4PEDVBFAL575FFK4AT4UBCO3SXE
         ==
         assert
         global GroupSize
@@ -210,7 +210,7 @@ const Algorand = {
         gtxn 2 Sender
         ==
         gtxn 2 ApplicationID
-        int 628095415
+        int 75101786
         ==
         &&
         gtxn 2 OnCompletion
@@ -218,7 +218,7 @@ const Algorand = {
         ==
         &&
         gtxn 3 ApplicationID
-        int 628095415
+        int 75101786
         ==
         &&
         gtxn 3 Sender
@@ -237,7 +237,7 @@ const Algorand = {
         b main_l18
         main_l20:
         gtxn 1 ApplicationID
-        int 628095415
+        int 75101786
         ==
         gtxna 1 ApplicationArgs 0
         byte "register_name"
@@ -310,7 +310,7 @@ const Algorand = {
         ==
         assert
         gtxn 0 Receiver
-        addr SYGCDTWGBXKV4ZL5YAWSYAVOUC25U2XDB6SMQHLRCTYVF566TQZ3EOABH4
+        addr ACFFHRILZQ6W2UDNYYTHV55YS6MZWJR4PEDVBFAL575FFK4AT4UBCO3SXE
         ==
         assert
         global GroupSize
@@ -333,7 +333,7 @@ const Algorand = {
         gtxn 2 Sender
         ==
         gtxn 2 ApplicationID
-        int 628095415
+        int 75101786
         ==
         &&
         gtxn 2 OnCompletion
@@ -341,7 +341,7 @@ const Algorand = {
         ==
         &&
         gtxn 3 ApplicationID
-        int 628095415
+        int 75101786
         ==
         &&
         gtxn 3 Sender
@@ -360,7 +360,7 @@ const Algorand = {
         b main_l27
         main_l29:
         gtxn 1 ApplicationID
-        int 628095415
+        int 75101786
         ==
         gtxna 1 ApplicationArgs 0
         byte "register_name"
@@ -475,7 +475,7 @@ const Algorand = {
             }
             return ({ found: false });
         } catch (err) {
-            
+            console.log(err);
             return ({ found: false });
         }
     },
