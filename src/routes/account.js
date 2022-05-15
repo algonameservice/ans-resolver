@@ -1,5 +1,5 @@
 const express = require('express');
-const algosdk = require('algosdk');
+
 const router = express.Router();
 
 const helper = require('../helper/Algorand.js');
@@ -11,6 +11,7 @@ const piscina = new Piscina({
 });
 
 const NodeCache = require('node-cache');
+const { isValidAddress } = require('algosdk');
 
 const namesCache = new NodeCache({
     stdTTL: 60*5,
@@ -19,9 +20,8 @@ const namesCache = new NodeCache({
 
 router.get('/:address', async function(req, res){
     const address = req.params.address;
-    let isValidAddress = algosdk.isValidAddress(address);
     
-    if(!isValidAddress) res.status(400).json({err: 'Invalid address'});
+    if(!isValidAddress(address)) res.status(400).json({err: 'Invalid address'});
     else {
         
         const params = req.query;
@@ -61,6 +61,34 @@ router.get('/:address', async function(req, res){
         }
     }
     
+    
 });
+
+
+router.get('/', async function(req, res) {
+    let accounts = req.query.accounts;
+    let domains = {};
+    try{
+        if(!accounts || accounts.length === 0) res.status(400).json({err: 'Send an array of accounts'});
+        for(let i in accounts) {
+            const account = accounts[i];
+            if(isValidAddress(account)) {
+                const response = await piscina.run(
+                    {
+                        address: account,
+                        limit:1
+                    }
+                );
+                if(response.length > 0) {
+                    domains[account] = response[0].name;
+                }
+            }
+        }
+    } catch (err){
+
+    }
+    res.status(200).json(domains);
+});
+
 
 module.exports = router;
