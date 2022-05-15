@@ -735,21 +735,25 @@ const Algorand = {
         let nextToken = '';
         let txnLength = 1;
         let txns = [];
-        let count=0;
         while(txnLength > 0){
             try{
-                let info = await indexer.lookupAccountTransactions(account).
-                limit(10000).
-                afterTime('2022-02-25').
-                nextToken(nextToken).do();
+                const info = await indexer
+                            .searchForTransactions()
+                            .address(account)
+                            .addressRole("sender")
+                            .afterTime("2022-02-24")
+                            .txType("appl")
+                            .applicationID(process.env.APP_ID)
+                            .nextToken(nextToken)
+                            .do();
                 txnLength=info.transactions.length;
                 if(txnLength > 0) {
-                    count++;
                     nextToken = info["next-token"];
                     txns.push(info.transactions);
                 }
                 
             }catch(err){
+                console.log(err);
                 return false;
             }
         }
