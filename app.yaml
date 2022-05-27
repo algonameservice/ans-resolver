@@ -2,6 +2,8 @@ runtime: nodejs14
 env_variables:
   PURESTAKE_CLIENT_URL: "https://mainnet-algorand.api.purestake.io/ps2"
   PURESTAKE_INDEXER_URL: "https://mainnet-algorand.api.purestake.io/idx2"
+  PURESTAKE_TESTNET_CLIENT_URL: "https://testnet-algorand.api.purestake.io/ps"
+  PURESTAKE_TESTNET_INDEXER_URL: "https://testnet-algorand.api.purestake.io/idx2"
   PURESTAKE_API_KEY: "cO9tTMC15iatR1J6xv0sx33fl12y8X8D48eTyuNp"
   APP_ID: "628095415"
   CHAR_3_AMOUNT: "150000000"
