@@ -90,7 +90,7 @@ const Algorand = {
     try {
       if (result.found)
         return {
-          name: name+'.algo',
+          name: `${name}.algo`,
           address: result.address,
           found: true,
         };

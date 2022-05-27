@@ -16,7 +16,7 @@ const resolveName = async ({ name, params }) => {
     nameInfo = await helper.searchForName(name);
     let result;
     result = {
-      name: name+'.algo',
+      name: `${name}.algo`,
       found: nameInfo.found,
       address: nameInfo.address,
     };
