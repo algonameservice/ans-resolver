@@ -1,35 +1,53 @@
-const algosdk = require('algosdk')
+const algosdk = require('algosdk');
 require('dotenv').config();
 
 module.exports.Client = () => {
-    if(process.env.NETWORK === "MainNet") {
-        return new algosdk.Algodv2({ 'X-API-KEY': process.env.PURESTAKE_API_KEY },
-            process.env.PURESTAKE_CLIENT_URL,
-            '');
-    }
-    if(process.env.NETWORK === "TestNet") {
-        return new algosdk.Algodv2({ 'X-API-KEY': process.env.PURESTAKE_API_KEY },
-            process.env.PURESTAKE_TESTNET_CLIENT_URL,
-            '');
-    }
-    return false;
-}
+  if (process.env.NETWORK === 'MainNet') {
+    return new algosdk.Algodv2(
+      { 'X-API-KEY': process.env.PURESTAKE_API_KEY },
+      process.env.PURESTAKE_CLIENT_URL,
+      ''
+    );
+  }
+  if (process.env.NETWORK === 'TestNet') {
+    return new algosdk.Algodv2(
+      { 'X-API-KEY': process.env.PURESTAKE_API_KEY },
+      process.env.PURESTAKE_TESTNET_CLIENT_URL,
+      ''
+    );
+  }
+  return false;
+};
 
 module.exports.Indexer = () => {
-    if(process.env.NETWORK === "MainNet") {
-        return new algosdk.Indexer('','https://algoindexer.algoexplorerapi.io','');
-    }
-    if(process.env.NETWORK === "TestNet") {
-        return new algosdk.Indexer('','https://algoindexer.testnet.algoexplorerapi.io','');
-    }
-    return false;
-}
+  if (process.env.NETWORK === 'MainNet') {
+    return new algosdk.Indexer(
+      '',
+      'https://algoindexer.algoexplorerapi.io',
+      ''
+    );
+  }
+  if (process.env.NETWORK === 'TestNet') {
+    return new algosdk.Indexer(
+      '',
+      'https://algoindexer.testnet.algoexplorerapi.io',
+      ''
+    );
+  }
+  return false;
+};
 
 module.exports.GetTeal = (name) => {
-    const APP_ID = process.env.NETWORK === "TestNet" ? parseInt(process.env.TESTNET_APP_ID, 10) : parseInt(process.env.APP_ID, 10);
-    const ESCROW = process.env.NETWORK === "TestNet" ? process.env.TESTNET_ESCROW : process.env.MAINNET_ESCROW;
+  const APP_ID =
+    process.env.NETWORK === 'TestNet'
+      ? parseInt(process.env.TESTNET_APP_ID, 10)
+      : parseInt(process.env.APP_ID, 10);
+  const ESCROW =
+    process.env.NETWORK === 'TestNet'
+      ? process.env.TESTNET_ESCROW
+      : process.env.MAINNET_ESCROW;
 
-    return `#pragma version 4
+  return `#pragma version 4
         byte "${name}"
         len
         int 3
@@ -416,6 +434,5 @@ module.exports.GetTeal = (name) => {
         store 0
         b main_l23
         main_l31:
-        return`
-
-}
+        return`;
+};
