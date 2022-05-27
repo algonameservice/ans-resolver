@@ -31,7 +31,7 @@ describe('app', () => {
       expect(response.text).toBe('{"message":"Not Found"}');
     });
   });
-  
+
   describe('GET names', () => {
     beforeEach(() => {
       // Avoid polluting the test output with 404 error messages
@@ -49,12 +49,10 @@ describe('app', () => {
       expect(response.statusCode).toBe(404);
       expect(response.text).toBe('{"found":false}');
     });
-    
+
     it('should respond to the GET method with a 200 for a name that is registered', async () => {
       const response = await request(app).get('/names/lmedury');
       expect(response.statusCode).toBe(200);
-      
     });
   });
-
 });
