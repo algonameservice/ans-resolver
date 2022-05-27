@@ -45,7 +45,7 @@ router.get('/:name', async function (req, res) {
       res.status(response.status).json(response.result);
     } else res.status(response.status).json(response.result);
   } else {
-    res.status(200).json({ found: true, address: cachedResult.address });
+    res.status(200).json({ found: true, address: cachedResult.address, name: name+'.algo'});
   }
 });
 

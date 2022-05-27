@@ -16,6 +16,7 @@ const resolveName = async ({ name, params }) => {
     nameInfo = await helper.searchForName(name);
     let result;
     result = {
+      name: name+'.algo',
       found: nameInfo.found,
       address: nameInfo.address,
     };
@@ -36,7 +37,6 @@ const resolveName = async ({ name, params }) => {
         if (record.key === keyToFind) {
           found = true;
           value = record.value;
-
           break;
         }
       }
