@@ -1,411 +1,15 @@
 const algosdk = require('algosdk')
 require('dotenv').config()
+const {Client, Indexer, GetTeal} = require('./Config');
 
-const client = new algosdk.Algodv2({ 'X-API-KEY': process.env.PURESTAKE_API_KEY },
-            process.env.PURESTAKE_CLIENT_URL,
-            '');
-
-
-/*const indexer = new algosdk.Indexer({ 'X-API-KEY': process.env.PURESTAKE_API_KEY },
-            process.env.PURESTAKE_INDEXER_URL,
-            '');  */
-
-const indexer = new algosdk.Indexer('','https://algoindexer.algoexplorerapi.io','');          
+const client = Client();
+const indexer = Indexer();          
+const APP_ID = process.env.NETWORK === "TestNet" ? parseInt(process.env.TESTNET_APP_ID, 10) : parseInt(process.env.APP_ID, 10);
 
 const Algorand = {
 
     generateTeal : (name) => {
-        
-        const tealCode = `#pragma version 4
-        byte "${name}"
-        len
-        int 3
-        ==
-        bnz main_l22
-        byte "${name}"
-        len
-        int 4
-        ==
-        bnz main_l13
-        byte "${name}"
-        len
-        int 5
-        >=
-        bnz main_l4
-        err
-        main_l4:
-        gtxn 0 Amount
-        int 5000000
-        >=
-        assert
-        byte "${name}"
-        len
-        int 64
-        <=
-        assert
-        int 0
-        store 0
-        main_l5:
-        load 0
-        byte "${name}"
-        len
-        <
-        bnz main_l12
-        global GroupSize
-        int 2
-        ==
-        global GroupSize
-        int 4
-        ==
-        ||
-        assert
-        gtxn 0 Sender
-        gtxn 1 Sender
-        ==
-        assert
-        gtxn 0 Receiver
-        addr SYGCDTWGBXKV4ZL5YAWSYAVOUC25U2XDB6SMQHLRCTYVF566TQZ3EOABH4
-        ==
-        assert
-        global GroupSize
-        int 2
-        ==
-        bnz main_l11
-        global GroupSize
-        int 4
-        ==
-        bnz main_l10
-        int 0
-        return
-        main_l9:
-        int 1
-        assert
-        int 1
-        b main_l31
-        main_l10:
-        gtxn 1 Receiver
-        gtxn 2 Sender
-        ==
-        gtxn 2 ApplicationID
-        int 628095415
-        ==
-        &&
-        gtxn 2 OnCompletion
-        int OptIn
-        ==
-        &&
-        gtxn 3 ApplicationID
-        int 628095415
-        ==
-        &&
-        gtxn 3 Sender
-        gtxn 0 Sender
-        ==
-        &&
-        gtxna 3 ApplicationArgs 0
-        byte "register_name"
-        ==
-        &&
-        gtxna 3 ApplicationArgs 1
-        byte "${name}"
-        ==
-        &&
-        assert
-        b main_l9
-        main_l11:
-        gtxn 1 ApplicationID
-        int 628095415
-        ==
-        gtxna 1 ApplicationArgs 0
-        byte "register_name"
-        ==
-        &&
-        gtxna 1 ApplicationArgs 1
-        byte "${name}"
-        ==
-        &&
-        assert
-        b main_l9
-        main_l12:
-        byte "${name}"
-        load 0
-        getbyte
-        int 97
-        >=
-        byte "${name}"
-        load 0
-        getbyte
-        int 122
-        <=
-        &&
-        byte "${name}"
-        load 0
-        getbyte
-        int 48
-        >=
-        byte "${name}"
-        load 0
-        getbyte
-        int 57
-        <=
-        &&
-        ||
-        assert
-        load 0
-        int 1
-        +
-        store 0
-        b main_l5
-        main_l13:
-        gtxn 0 Amount
-        int 50000000
-        >=
-        assert
-        byte "${name}"
-        len
-        int 64
-        <=
-        assert
-        int 0
-        store 0
-        main_l14:
-        load 0
-        byte "${name}"
-        len
-        <
-        bnz main_l21
-        global GroupSize
-        int 2
-        ==
-        global GroupSize
-        int 4
-        ==
-        ||
-        assert
-        gtxn 0 Sender
-        gtxn 1 Sender
-        ==
-        assert
-        gtxn 0 Receiver
-        addr SYGCDTWGBXKV4ZL5YAWSYAVOUC25U2XDB6SMQHLRCTYVF566TQZ3EOABH4
-        ==
-        assert
-        global GroupSize
-        int 2
-        ==
-        bnz main_l20
-        global GroupSize
-        int 4
-        ==
-        bnz main_l19
-        int 0
-        return
-        main_l18:
-        int 1
-        assert
-        int 1
-        b main_l31
-        main_l19:
-        gtxn 1 Receiver
-        gtxn 2 Sender
-        ==
-        gtxn 2 ApplicationID
-        int 628095415
-        ==
-        &&
-        gtxn 2 OnCompletion
-        int OptIn
-        ==
-        &&
-        gtxn 3 ApplicationID
-        int 628095415
-        ==
-        &&
-        gtxn 3 Sender
-        gtxn 0 Sender
-        ==
-        &&
-        gtxna 3 ApplicationArgs 0
-        byte "register_name"
-        ==
-        &&
-        gtxna 3 ApplicationArgs 1
-        byte "${name}"
-        ==
-        &&
-        assert
-        b main_l18
-        main_l20:
-        gtxn 1 ApplicationID
-        int 628095415
-        ==
-        gtxna 1 ApplicationArgs 0
-        byte "register_name"
-        ==
-        &&
-        gtxna 1 ApplicationArgs 1
-        byte "${name}"
-        ==
-        &&
-        assert
-        b main_l18
-        main_l21:
-        byte "${name}"
-        load 0
-        getbyte
-        int 97
-        >=
-        byte "${name}"
-        load 0
-        getbyte
-        int 122
-        <=
-        &&
-        byte "${name}"
-        load 0
-        getbyte
-        int 48
-        >=
-        byte "${name}"
-        load 0
-        getbyte
-        int 57
-        <=
-        &&
-        ||
-        assert
-        load 0
-        int 1
-        +
-        store 0
-        b main_l14
-        main_l22:
-        gtxn 0 Amount
-        int 150000000
-        >=
-        assert
-        byte "${name}"
-        len
-        int 64
-        <=
-        assert
-        int 0
-        store 0
-        main_l23:
-        load 0
-        byte "${name}"
-        len
-        <
-        bnz main_l30
-        global GroupSize
-        int 2
-        ==
-        global GroupSize
-        int 4
-        ==
-        ||
-        assert
-        gtxn 0 Sender
-        gtxn 1 Sender
-        ==
-        assert
-        gtxn 0 Receiver
-        addr SYGCDTWGBXKV4ZL5YAWSYAVOUC25U2XDB6SMQHLRCTYVF566TQZ3EOABH4
-        ==
-        assert
-        global GroupSize
-        int 2
-        ==
-        bnz main_l29
-        global GroupSize
-        int 4
-        ==
-        bnz main_l28
-        int 0
-        return
-        main_l27:
-        int 1
-        assert
-        int 1
-        b main_l31
-        main_l28:
-        gtxn 1 Receiver
-        gtxn 2 Sender
-        ==
-        gtxn 2 ApplicationID
-        int 628095415
-        ==
-        &&
-        gtxn 2 OnCompletion
-        int OptIn
-        ==
-        &&
-        gtxn 3 ApplicationID
-        int 628095415
-        ==
-        &&
-        gtxn 3 Sender
-        gtxn 0 Sender
-        ==
-        &&
-        gtxna 3 ApplicationArgs 0
-        byte "register_name"
-        ==
-        &&
-        gtxna 3 ApplicationArgs 1
-        byte "${name}"
-        ==
-        &&
-        assert
-        b main_l27
-        main_l29:
-        gtxn 1 ApplicationID
-        int 628095415
-        ==
-        gtxna 1 ApplicationArgs 0
-        byte "register_name"
-        ==
-        &&
-        gtxna 1 ApplicationArgs 1
-        byte "${name}"
-        ==
-        &&
-        assert
-        b main_l27
-        main_l30:
-        byte "${name}"
-        load 0
-        getbyte
-        int 97
-        >=
-        byte "${name}"
-        load 0
-        getbyte
-        int 122
-        <=
-        &&
-        byte "${name}"
-        load 0
-        getbyte
-        int 48
-        >=
-        byte "${name}"
-        load 0
-        getbyte
-        int 57
-        <=
-        &&
-        ||
-        assert
-        load 0
-        int 1
-        +
-        store 0
-        b main_l23
-        main_l31:
-        return`
-
-        return tealCode;
+        return GetTeal(name);
     },
 
     generateLsig: async (name) => {
@@ -422,17 +26,16 @@ const Algorand = {
     searchForName : async (name) => {
         
         const lsig = await Algorand.generateLsig(name);
-
         try {
             let accountInfo = await indexer.lookupAccountByID(lsig.address()).do();
             
             accountInfo = accountInfo.account['apps-local-state'];
             
-            const length = accountInfo.length;
+            const {length} = accountInfo;
             for (let i = 0; i < length; i++) {
                 let app = accountInfo[i];
                 
-                if (app.id === parseInt(parseInt(process.env.APP_ID))) {
+                if (app.id === parseInt(parseInt(APP_ID))) {
 
                     let kv = app['key-value'];
 
@@ -514,7 +117,7 @@ const Algorand = {
         params.fee = 1000;
         params.flatFee = true;
 
-        let receiver = algosdk.getApplicationAddress(parseInt(parseInt(process.env.APP_ID)));
+        let receiver = algosdk.getApplicationAddress(parseInt(parseInt(APP_ID)));
         let sender = address;
 
         if(period === undefined) period = 0
@@ -550,7 +153,7 @@ const Algorand = {
         let txn3 = await algosdk.makeApplicationOptInTxnFromObject({
             from: lsig.address(),
             suggestedParams: params,
-            appIndex: parseInt(parseInt(process.env.APP_ID))
+            appIndex: parseInt(parseInt(APP_ID))
         });
 
         groupTxns.push(txn3);
@@ -572,7 +175,7 @@ const Algorand = {
         //appArgs.push(algosdk.decodeAddress(account).publicKey);
         appArgs.push(new Uint8Array(Buffer.from(name)))
         appArgs.push(algosdk.encodeUint64(period))
-        let txn4 = await algosdk.makeApplicationNoOpTxn(address, params, parseInt(parseInt(process.env.APP_ID)), appArgs, [lsig.address()]);
+        let txn4 = await algosdk.makeApplicationNoOpTxn(address, params, parseInt(parseInt(APP_ID)), appArgs, [lsig.address()]);
         groupTxns.push(txn4);
 
         algosdk.assignGroupID(groupTxns);
@@ -586,7 +189,7 @@ const Algorand = {
     async createRenewalTxn (name, sender, years, amt) {
         //amt = algosdk.algosToMicroalgos(amt);
         const params = await client.getTransactionParams().do();
-        let receiver = algosdk.getApplicationAddress(parseInt(process.env.APP_ID));
+        let receiver = algosdk.getApplicationAddress(parseInt(APP_ID));
         let closeToRemaninder=undefined;
         let note=undefined;
         let paymentTxn = algosdk.makePaymentTxnWithSuggestedParams(sender, receiver, amt, closeToRemaninder, note, params);
@@ -599,7 +202,7 @@ const Algorand = {
         appArgs.push(new Uint8Array(Buffer.from("renew_name")));
         appArgs.push(algosdk.encodeUint64(years));
 
-        let applicationTxn = algosdk.makeApplicationNoOpTxn(sender, params, parseInt(process.env.APP_ID), appArgs, [lsig.address()]);
+        let applicationTxn = algosdk.makeApplicationNoOpTxn(sender, params, parseInt(APP_ID), appArgs, [lsig.address()]);
 
         algosdk.assignGroupID([paymentTxn, applicationTxn]);
 
@@ -631,7 +234,7 @@ const Algorand = {
             appArgs.push(new Uint8Array(Buffer.from(network)));
             appArgs.push(new Uint8Array(Buffer.from(handle)));
 
-            let txn = await algosdk.makeApplicationNoOpTxn(address, params, parseInt(parseInt(process.env.APP_ID)), appArgs, [lsig.address()]);
+            let txn = await algosdk.makeApplicationNoOpTxn(address, params, parseInt(parseInt(APP_ID)), appArgs, [lsig.address()]);
             groupTxns.push(txn);
         }
 
@@ -652,7 +255,7 @@ const Algorand = {
         appArgs.push(new Uint8Array(Buffer.from("initiate_transfer")));
         appArgs.push(algosdk.encodeUint64(price));
 
-        let applicationTxn = algosdk.makeApplicationNoOpTxn(sender, params, parseInt(parseInt(process.env.APP_ID)), appArgs, [lsig.address(), newOwner]);
+        let applicationTxn = algosdk.makeApplicationNoOpTxn(sender, params, parseInt(parseInt(APP_ID)), appArgs, [lsig.address(), newOwner]);
         return applicationTxn;
 
     },
@@ -665,7 +268,7 @@ const Algorand = {
         let note=undefined;
         let paymentToOwnerTxn = algosdk.makePaymentTxnWithSuggestedParams(sender, receiver, amt, closeToRemaninder, note, params);
 
-        receiver = algosdk.getApplicationAddress(parseInt(parseInt(process.env.APP_ID)));
+        receiver = algosdk.getApplicationAddress(parseInt(parseInt(APP_ID)));
         
         let paymentToSmartContractTxn = algosdk.makePaymentTxnWithSuggestedParams(sender, receiver, parseInt(process.env.TRANSFER_FEE), closeToRemaninder, note, params);
 
@@ -676,7 +279,7 @@ const Algorand = {
         let appArgs = [];
         appArgs.push(new Uint8Array(Buffer.from("accept_transfer")));
         
-        let applicationTxn = algosdk.makeApplicationNoOpTxn(sender, params, parseInt(parseInt(process.env.APP_ID)), appArgs, [lsig.address()]);
+        let applicationTxn = algosdk.makeApplicationNoOpTxn(sender, params, parseInt(parseInt(APP_ID)), appArgs, [lsig.address()]);
 
         algosdk.assignGroupID([paymentToOwnerTxn, paymentToSmartContractTxn, applicationTxn]);
 
@@ -703,7 +306,7 @@ const Algorand = {
         
         while(txnLength > 0){
             try{
-                let info = await indexer.searchForTransactions().applicationID(process.env.APP_ID || 628095415).
+                let info = await indexer.searchForTransactions().applicationID(APP_ID || 628095415).
                 limit(10000).
                 nextToken(nextToken).
                 afterTime(timestamp).do();
@@ -743,7 +346,7 @@ const Algorand = {
                             .addressRole("sender")
                             .afterTime("2022-02-24")
                             .txType("appl")
-                            .applicationID(process.env.APP_ID)
+                            .applicationID(APP_ID)
                             .nextToken(nextToken)
                             .do();
                 txnLength=info.transactions.length;
@@ -773,7 +376,7 @@ const Algorand = {
                 
                 if(txn["tx-type"] === "appl") {
                     
-                    if(txn["application-transaction"]["application-id"] === parseInt(parseInt(process.env.APP_ID))) {
+                    if(txn["application-transaction"]["application-id"] === parseInt(parseInt(APP_ID))) {
                         
                         let appArgs = txn["application-transaction"]["application-args"];
                         
@@ -788,7 +391,7 @@ const Algorand = {
                             
                             const length = accountInfo.length;
                             for(let i=0; i<length; i++){
-                                if(accountInfo[i].id === parseInt(parseInt(process.env.APP_ID))) {
+                                if(accountInfo[i].id === parseInt(parseInt(APP_ID))) {
                                     let kvPairs = accountInfo[i]["key-value"];
                                     for(let j=0; j<kvPairs.length; j++) {
                                         let key = Buffer.from(kvPairs[j].key, 'base64').toString();
