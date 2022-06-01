@@ -1,12 +1,14 @@
 const { default: algosdk } = require('algosdk');
 const express = require('express');
-
-const router = express.Router();
 const NodeCache = require('node-cache');
 const path = require('path');
 const Piscina = require('piscina');
 const helper = require('../helper/Algorand');
 const Insights = require('../helper/Insights');
+const domains = require('../data/domains.json');
+const cron = require('node-cron');
+
+const router = express.Router();
 
 const piscina = new Piscina({
   filename: path.resolve(__dirname, '../helper/resolveNameThread.js'),
@@ -15,6 +17,24 @@ const piscina = new Piscina({
 const namesCache = new NodeCache({
   stdTTL: 60 * 5,
   deleteOnExpire: true,
+});
+
+let domainsInMemory = {
+  timestamp: '2022-05-31',
+  ...domains
+}
+
+cron.schedule('*/1 * * * *', () => {
+  const latestDomains = helper.getLatestDomains(domainsInMemory.timestamp);
+  latestDomains.then(res => {
+    domainsInMemory.timestamp = new Date();
+    for(let i in res) {
+      const startingLetter = i[0];
+      if(!domainsInMemory[startingLetter].includes(i)){
+        domainsInMemory[startingLetter].push(i);
+      }
+    }
+  });
 });
 
 router.get('/insights', async function (req, res) {
@@ -299,7 +319,16 @@ router.post('/accept-transfer', async function (req, res) {
 });
 
 router.get('/', function (req, res) {
-  res.status(400).send('Provide a name to lookup');
+  const params = req.query;
+  if(params.pattern) {
+    const pattern = params.pattern;
+    if(pattern.length > 0){
+      res.json(domainsInMemory[pattern[0]].filter((domain) => domain.startsWith(pattern)));
+    }
+  }
+  else {
+    res.status(400).send('Provide a name to lookup');
+  }
 });
 
 module.exports = router;
