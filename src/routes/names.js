@@ -22,7 +22,7 @@ const namesCache = new NodeCache({
 
 let domainsInMemory = {
   timestamp: '2022-05-31',
-  ...testnetDomains
+  ...domains
 }
 
 cron.schedule('*/1 * * * *', () => {
