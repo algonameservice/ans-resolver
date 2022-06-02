@@ -26,16 +26,36 @@ let domainsInMemory = {
 }
 
 cron.schedule('*/1 * * * *', () => {
+  
   const latestDomains = helper.getLatestDomains(domainsInMemory.timestamp);
   latestDomains.then(res => {
     domainsInMemory.timestamp = new Date();
-    for(let i in res) {
+    const { latestDomainsRetrieved, latestTransfers } = res
+    
+    for(let i in latestDomainsRetrieved) {
       const startingLetter = i[0];
-      if(!domainsInMemory[startingLetter].includes(i)){
-        domainsInMemory[startingLetter].push(i);
+      const existing = domainsInMemory[startingLetter].find(domain => domain.name === i+'.algo');
+      if(!existing) {
+        domainsInMemory[startingLetter].push(latestDomainsRetrieved[i]);
       }
     }
+    try{
+      for(let i in latestTransfers) {
+        const startingLetter = i[0];
+        const owner = latestTransfers[i];
+        for (let j in domainsInMemory[startingLetter]){
+          if(domainsInMemory[startingLetter][j].name === i+'.algo'){
+            domainsInMemory[startingLetter][j].address = owner;
+            break;
+          }
+        }
+      }
+    } catch (err) {
+      
+    }
+
   });
+  
 });
 
 router.get('/insights', async function (req, res) {
@@ -325,7 +345,14 @@ router.get('/', function (req, res) {
     const pattern = params.pattern;
     if(pattern.length > 0){
       if(domainsInMemory[pattern[0]]) {
-        res.json(domainsInMemory[pattern[0]].filter((domain) => domain.startsWith(pattern)));
+        const filteredDomains = domainsInMemory[pattern[0]].filter((domain) => domain.name.startsWith(pattern));
+        res.json(filteredDomains.map(domain => {
+          return {
+            name: domain.name,
+            address: domain.address,
+            found: true
+          }
+        }));
       }
       else {
         res.json([]);

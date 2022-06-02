@@ -40,6 +40,7 @@ const Algorand = {
     }
     const info = allTxns.reverse();
     let domains = {};
+    let transfers = {};
     for(let i=0; i<info.length; i++) {
         const applTxn = info[i]["application-transaction"];
         
@@ -52,14 +53,53 @@ const Algorand = {
                 const domain = Buffer.from(args[1], 'base64').toString();
                 domains[domain] = {
                     lsig: accounts[0],
-                    owner: sender
+                    address: sender,
+                    found: true,
+                    name: domain+'.algo'
                 }
+            } else if(Buffer.from(args[0], 'base64').toString() === 'accept_transfer'){
+                try{
+                  let accountInfo = await indexer
+                    .lookupAccountByID(accounts[0])
+                    .do();
+                  accountInfo = accountInfo.account['apps-local-state'];
+                  const { length } = accountInfo;
+                  for (let i = 0; i < length; i++) {
+                    if (accountInfo[i].id === APP_ID) {
+                      const kvPairs = accountInfo[i]['key-value'];
+                      for (let j = 0; j < kvPairs.length; j++) {
+                        const key = Buffer.from(
+                          kvPairs[j].key,
+                          'base64'
+                        ).toString();
+                        const value = Buffer.from(
+                          kvPairs[j].value.bytes,
+                          'base64'
+                        ).toString();
+
+                        if (key === 'name') {
+                          if(!transfers[value]) {
+                            transfers[value] = sender;
+                          } 
+                          break;
+                        }
+                      }
+                    }
+                  }
+
+                } catch (err) {
+                  console.log(err);
+                }
+                
                 
             }
         } 
         
     }
-    return domains;
+    return {
+      latestDomainsRetrieved: domains,
+      latestTransfers: transfers
+    };
   },
 
   generateTeal: (name) => {
