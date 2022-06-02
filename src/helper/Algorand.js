@@ -59,7 +59,6 @@ const Algorand = {
                 }
             } else if(Buffer.from(args[0], 'base64').toString() === 'accept_transfer'){
                 try{
-                  
                   let accountInfo = await indexer
                     .lookupAccountByID(accounts[0])
                     .do();
@@ -79,7 +78,9 @@ const Algorand = {
                         ).toString();
 
                         if (key === 'name') {
-                          transfers[value] = sender;
+                          if(!transfers[value]) {
+                            transfers[value] = sender;
+                          } 
                           break;
                         }
                       }
@@ -97,7 +98,7 @@ const Algorand = {
     }
     return {
       latestDomainsRetrieved: domains,
-      transfers
+      latestTransfers: transfers
     };
   },
 

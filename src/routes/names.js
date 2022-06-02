@@ -6,7 +6,7 @@ const Piscina = require('piscina');
 const helper = require('../helper/Algorand');
 const Insights = require('../helper/Insights');
 const domains = require('../data/hash-table.json');
-const testnetDomains = require('../data/testnet-domains.json');
+const testnetDomains = require('../data/hash-table-testnet.json');
 const cron = require('node-cron');
 
 const router = express.Router();
@@ -44,9 +44,10 @@ cron.schedule('*/1 * * * *', () => {
       for(let i in latestTransfers) {
         const startingLetter = i[0];
         const owner = latestTransfers[i];
-        for (let j in latestDomainsRetrieved[startingLetter]){
-          if(j.name === i+'.algo'){
+        for (let j in domainsInMemory[startingLetter]){
+          if(domainsInMemory[startingLetter][j].name === i+'.algo'){
             domainsInMemory[startingLetter][j].address = owner;
+            break;
           }
         }
       }
