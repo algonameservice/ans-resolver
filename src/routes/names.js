@@ -5,7 +5,7 @@ const path = require('path');
 const Piscina = require('piscina');
 const helper = require('../helper/Algorand');
 const Insights = require('../helper/Insights');
-const domains = require('../data/domains.json');
+const domains = require('../data/hash-table.json');
 const testnetDomains = require('../data/testnet-domains.json');
 const cron = require('node-cron');
 
@@ -25,18 +25,39 @@ let domainsInMemory = {
   ...domains
 }
 
+
 cron.schedule('*/1 * * * *', () => {
+  
   const latestDomains = helper.getLatestDomains(domainsInMemory.timestamp);
   latestDomains.then(res => {
     domainsInMemory.timestamp = new Date();
-    for(let i in res) {
+    const { latestDomainsRetrieved, latestTransfers } = res
+    
+    for(let i in latestDomainsRetrieved) {
       const startingLetter = i[0];
-      if(!domainsInMemory[startingLetter].includes(i)){
-        domainsInMemory[startingLetter].push(i);
+      const existing = domainsInMemory[startingLetter].find(domain => domain.name === i+'.algo');
+      if(!existing) {
+        domainsInMemory[startingLetter].push(latestDomainsRetrieved[i]);
       }
     }
+    try{
+      for(let i in latestTransfers) {
+        const startingLetter = i[0];
+        const owner = latestTransfers[i];
+        for (let j in latestDomainsRetrieved[startingLetter]){
+          if(j.name === i+'.algo'){
+            domainsInMemory[startingLetter][j].address = owner;
+          }
+        }
+      }
+    } catch (err) {
+      
+    }
+
   });
+  
 });
+
 
 router.get('/insights', async function (req, res) {
   const insightsInformation = await new Insights().getInsights();
@@ -325,7 +346,14 @@ router.get('/', function (req, res) {
     const pattern = params.pattern;
     if(pattern.length > 0){
       if(domainsInMemory[pattern[0]]) {
-        res.json(domainsInMemory[pattern[0]].filter((domain) => domain.startsWith(pattern)));
+        const filteredDomains = domainsInMemory[pattern[0]].filter((domain) => domain.name.startsWith(pattern));
+        res.json(filteredDomains.map(domain => {
+          return {
+            name: domain.name,
+            address: domain.address,
+            found: true
+          }
+        }));
       }
       else {
         res.json([]);
