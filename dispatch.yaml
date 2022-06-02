@@ -1,0 +1,3 @@
+dispatch:
+  - url: "testnet.api.algonameservice.com/*"
+    service: "testnet"

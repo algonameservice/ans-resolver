@@ -10,6 +10,58 @@ const APP_ID =
     : parseInt(process.env.APP_ID, 10);
 
 const Algorand = {
+
+  getLatestDomains: async (timestamp) => {
+    let nextToken = '';
+    let txnLength = 1;
+    let txns = [];
+    while(txnLength > 0){
+        try{
+            let info = await indexer.searchForTransactions().applicationID(APP_ID).
+            limit(10000).
+            nextToken(nextToken).
+            afterTime(timestamp).
+            do();
+            txnLength=info.transactions.length;
+            if(txnLength > 0) {
+                nextToken = info["next-token"];
+                txns.push(info.transactions);
+            }
+            
+            
+        }catch(err){
+            return false;
+        }
+    }
+
+    let allTxns = [];
+    for(let i=0; i<txns.length; i++){
+        allTxns=allTxns.concat(txns[i]);
+    }
+    const info = allTxns.reverse();
+    let domains = {};
+    for(let i=0; i<info.length; i++) {
+        const applTxn = info[i]["application-transaction"];
+        
+        let sender = info[i]["sender"];
+        let args = info[i]["application-transaction"]["application-args"];
+        let accounts = info[i]["application-transaction"]["accounts"];
+        
+        if(args.length > 0) {
+            if(Buffer.from(args[0], 'base64').toString() === 'register_name'){
+                const domain = Buffer.from(args[1], 'base64').toString();
+                domains[domain] = {
+                    lsig: accounts[0],
+                    owner: sender
+                }
+                
+            }
+        } 
+        
+    }
+    return domains;
+  },
+
   generateTeal: (name) => {
     return GetTeal(name);
   },
@@ -24,7 +76,13 @@ const Algorand = {
   },
 
   searchForName: async (name) => {
-    const lsig = await Algorand.generateLsig(name);
+    let lsig;
+    try{
+      lsig = await Algorand.generateLsig(name);
+    } catch (err) {
+
+    }
+    
     try {
       let accountInfo = await indexer.lookupAccountByID(lsig.address()).do();
 
@@ -417,7 +475,6 @@ const Algorand = {
           txns.push(info.transactions);
         }
       } catch (err) {
-        console.log(err);
         return false;
       }
     }
