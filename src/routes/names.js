@@ -5,8 +5,8 @@ const path = require('path');
 const Piscina = require('piscina');
 const helper = require('../helper/Algorand');
 const Insights = require('../helper/Insights');
-const domains = require('../data/domains.json');
-const testnetDomains = require('../data/testnet-domains.json');
+const domains = require('../data/hash-table.json');
+const testnetDomains = require('../data/hash-table-testnet.json');
 const cron = require('node-cron');
 
 const router = express.Router();
