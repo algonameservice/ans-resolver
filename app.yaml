@@ -1,4 +1,5 @@
 runtime: nodejs14
+service: testnet
 env_variables:
   PURESTAKE_CLIENT_URL: "https://mainnet-algorand.api.purestake.io/ps2"
   PURESTAKE_INDEXER_URL: "https://mainnet-algorand.api.purestake.io/idx2"
@@ -13,7 +14,7 @@ env_variables:
   TESTNET_APP_ID: "75101786"
   TESTNET_ESCROW: "ACFFHRILZQ6W2UDNYYTHV55YS6MZWJR4PEDVBFAL575FFK4AT4UBCO3SXE"
   MAINNET_ESCROW: "SYGCDTWGBXKV4ZL5YAWSYAVOUC25U2XDB6SMQHLRCTYVF566TQZ3EOABH4"
-  NETWORK: "MainNet"
+  NETWORK: "TestNet"
   
 instance_class: F2
 automatic_scaling:

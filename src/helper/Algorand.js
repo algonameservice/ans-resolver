@@ -30,7 +30,6 @@ const Algorand = {
             
             
         }catch(err){
-            console.log(err);
             return false;
         }
     }
@@ -476,7 +475,6 @@ const Algorand = {
           txns.push(info.transactions);
         }
       } catch (err) {
-        console.log(err);
         return false;
       }
     }

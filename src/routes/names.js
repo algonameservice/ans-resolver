@@ -6,6 +6,7 @@ const Piscina = require('piscina');
 const helper = require('../helper/Algorand');
 const Insights = require('../helper/Insights');
 const domains = require('../data/domains.json');
+const testnetDomains = require('../data/testnet-domains.json');
 const cron = require('node-cron');
 
 const router = express.Router();
@@ -21,7 +22,7 @@ const namesCache = new NodeCache({
 
 let domainsInMemory = {
   timestamp: '2022-05-31',
-  ...domains
+  ...testnetDomains
 }
 
 cron.schedule('*/1 * * * *', () => {
@@ -323,7 +324,12 @@ router.get('/', function (req, res) {
   if(params.pattern) {
     const pattern = params.pattern;
     if(pattern.length > 0){
-      res.json(domainsInMemory[pattern[0]].filter((domain) => domain.startsWith(pattern)));
+      if(domainsInMemory[pattern[0]]) {
+        res.json(domainsInMemory[pattern[0]].filter((domain) => domain.startsWith(pattern)));
+      }
+      else {
+        res.json([]);
+      }
     }
   }
   else {

@@ -106,7 +106,6 @@ class Insights {
             */
     } else {
       cacheObject = { ...insightsInfo };
-      console.log(cacheObject);
       let latestData = await this.loadTransactionsAfterTimestamp(
         cacheObject.latestPullTimestamp,
         cacheObject
@@ -156,7 +155,7 @@ class Insights {
           }
         }
       } catch (err) {
-        console.log('err');
+        
       }
     }
 
