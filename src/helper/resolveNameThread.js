@@ -22,7 +22,7 @@ const resolveName = async ({ name, params }) => {
     };
     if (params.socials === 'true' && params.metadata === 'true') {
       result.socials = nameInfo.socials;
-      result.metadata = nameInfo.data;
+      result.metadata = nameInfo.metadata;
     } else if (params.socials === 'true') {
       result.socials = nameInfo.socials;
     } else if (params.metadata === 'true') {

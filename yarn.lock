@@ -2,6 +2,15 @@
 # yarn lockfile v1
 
 
+"@algonameservice/sdk@^0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@algonameservice/sdk/-/sdk-0.4.0.tgz#04584f8720d5945afefa715f0df452dc2b495eb8"
+  integrity sha512-3eBwT18Iz+MJO2NZAvJYn+NZOk559lyd181fW91i0GnfYaQDGk8JH6JLdf2O8j/9vfB6RP2f+37k4RV8edOsjA==
+  dependencies:
+    "@types/node" "^17.0.21"
+    algosdk "^1.13.1"
+    typescript "^4.6.4"
+
 "@assemblyscript/loader@^0.10.1":
   version "0.10.1"
   resolved "https://registry.yarnpkg.com/@assemblyscript/loader/-/loader-0.10.1.tgz#70e45678f06c72fa2e350e8553ec4a4d72b92e06"
@@ -428,6 +437,11 @@
   resolved "https://registry.yarnpkg.com/@types/json5/-/json5-0.0.29.tgz#ee28707ae94e11d2b827bcbe5270bcea7f3e71ee"
   integrity sha1-7ihweulOEdK4J7y+UnC86n8+ce4=
 
+"@types/node@^17.0.21":
+  version "17.0.40"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-17.0.40.tgz#76ee88ae03650de8064a6cf75b8d95f9f4a16090"
+  integrity sha512-UXdBxNGqTMtm7hCwh9HtncFVLrXoqA3oJW30j6XWp5BH/wu3mVeaxo7cq5benFdBw34HB3XDT2TRPI7rXZ+mDg==
+
 "@types/stack-utils@^1.0.1":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@types/stack-utils/-/stack-utils-1.0.1.tgz#0a851d3bd96498fa25c33ab7278ed3bd65f06c3e"
@@ -510,6 +524,22 @@ algosdk@^1.12.0:
   version "1.13.1"
   resolved "https://registry.yarnpkg.com/algosdk/-/algosdk-1.13.1.tgz#c6b5b12121cb24efb5fb518e7886e81d87ed44e1"
   integrity sha512-htyJI1/zVcOzpNZVT8PHn4K0yXXTS+b7RXplc7nmFqGVThbM8+ufbnBLChxVPh3BVxqqpqS13VTsQcNArK10jg==
+  dependencies:
+    algo-msgpack-with-bigint "^2.1.1"
+    buffer "^6.0.2"
+    hi-base32 "^0.5.1"
+    js-sha256 "^0.9.0"
+    js-sha3 "^0.8.0"
+    js-sha512 "^0.8.0"
+    json-bigint "^1.0.0"
+    superagent "^6.1.0"
+    tweetnacl "^1.0.3"
+    url-parse "^1.5.1"
+
+algosdk@^1.13.1:
+  version "1.17.0"
+  resolved "https://registry.yarnpkg.com/algosdk/-/algosdk-1.17.0.tgz#fd61e6d97d976b007df9c26b864037a325481a34"
+  integrity sha512-WwHbZV03tZ2C/VLOapWOzJImm4lokav9HXnPLqbGrXyb8Gn/Q2AsoKMbOxd6MTzWguhaXU4Yk0VtbFlYhkaeoA==
   dependencies:
     algo-msgpack-with-bigint "^2.1.1"
     buffer "^6.0.2"
@@ -5067,6 +5097,11 @@ typedarray-to-buffer@^3.1.5:
   integrity sha512-zdu8XMNEDepKKR+XYOXAVPtWui0ly0NtohUscw+UmaHiAWT8hrV1rr//H6V+0DvJ3OQ19S979M0laLfX8rm82Q==
   dependencies:
     is-typedarray "^1.0.0"
+
+typescript@^4.6.4:
+  version "4.7.3"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.7.3.tgz#8364b502d5257b540f9de4c40be84c98e23a129d"
+  integrity sha512-WOkT3XYvrpXx4vMMqlD+8R8R37fZkjyLGlxavMc4iB8lrl8L0DeTcHbYgw/v0N/z9wAFsgBhcsF0ruoySS22mA==
 
 unbox-primitive@^1.0.1:
   version "1.0.1"

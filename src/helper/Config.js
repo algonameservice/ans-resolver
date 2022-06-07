@@ -4,15 +4,15 @@ require('dotenv').config();
 module.exports.Client = () => {
   if (process.env.NETWORK === 'MainNet') {
     return new algosdk.Algodv2(
-      { 'X-API-KEY': process.env.PURESTAKE_API_KEY },
-      process.env.PURESTAKE_CLIENT_URL,
+      '',
+      process.env.MAINNET_NODE_URL,
       ''
     );
   }
   if (process.env.NETWORK === 'TestNet') {
     return new algosdk.Algodv2(
-      { 'X-API-KEY': process.env.PURESTAKE_API_KEY },
-      process.env.PURESTAKE_TESTNET_CLIENT_URL,
+      '',
+      process.env.TESTNET_NODE_URL,
       ''
     );
   }
@@ -23,14 +23,14 @@ module.exports.Indexer = () => {
   if (process.env.NETWORK === 'MainNet') {
     return new algosdk.Indexer(
       '',
-      'https://algoindexer.algoexplorerapi.io',
+      process.env.MAINNET_INDEXER_URL,
       ''
     );
   }
   if (process.env.NETWORK === 'TestNet') {
     return new algosdk.Indexer(
       '',
-      'https://algoindexer.testnet.algoexplorerapi.io',
+      process.env.TESTNET_INDEXER_URL,
       ''
     );
   }
