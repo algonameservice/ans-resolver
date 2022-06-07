@@ -347,7 +347,12 @@ router.get('/', function (req, res) {
     const pattern = params.pattern;
     if(pattern.length > 0){
       if(domainsInMemory[pattern[0]]) {
-        const filteredDomains = domainsInMemory[pattern[0]].filter((domain) => domain.name.startsWith(pattern));
+        let filteredDomains = domainsInMemory[pattern[0]].filter((domain) => domain.name.startsWith(pattern));
+        filteredDomains.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0));
+        const limit = params.limit ? parseInt(params.limit) : 10;
+        if(filteredDomains.length > limit) {
+          filteredDomains = filteredDomains.splice(0, limit);
+        }
         res.json(filteredDomains.map(domain => {
           return {
             name: domain.name,
