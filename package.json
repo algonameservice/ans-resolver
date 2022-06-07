@@ -8,7 +8,8 @@
     "test": "jest",
     "test:watch": "jest --watchAll",
     "lint": "eslint .",
-    "lint:fix": "eslint --fix ."
+    "lint:fix": "eslint --fix .",
+    "format": "prettier --write src/"
   },
   "dependencies": {
     "algosdk": "^1.12.0",
@@ -19,6 +20,7 @@
     "http-errors": "^1.8.0",
     "morgan": "^1.10.0",
     "node-cache": "^5.1.2",
+    "node-cron": "^3.0.0",
     "piscina": "^3.2.0"
   },
   "devDependencies": {
@@ -29,6 +31,7 @@
     "eslint-plugin-prettier": "^3.4.0",
     "jest": "^24.9.0",
     "nodemon": "^2.0.12",
+    "prettier": "^2.6.2",
     "supertest": "^3.4.2"
   },
   "jest": {
