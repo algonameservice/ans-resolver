@@ -120,6 +120,68 @@ Get the transactions to update the key value pairs associated with a .algo name
 }
 ```
 
+⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃
+
+## Update Value 
+Value property is set by the owner of a domain if they wish to have their domain resolved to a different account.
+Only the owner address can authorize any transactions on their domain
+
+Get the transactions to update the value property associated with a .algo name
+### Method: POST
+>```
+>https://ansresolver.com/names/update-value
+>```
+### Body (**raw**)
+
+```json
+/* Sample Body */
+{
+    "name": "johndoe07.algo", 
+    "address": "PRVIUNUJ2TIPL5PK5NFMPTUF2DQL5ZVU7IENDNNB2U4JEGW5FYCEQF2HOQ", 
+    "value": "G5EIF27LMQZPLJP45OYVNSCHIU4JQ2C2PERIDMHWDJOTIXBCZHBS4H5HCU"
+}
+```
+
+⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃
+
+## Set default domain 
+Default domain, if set by the user, will be displayed instead of wallet addresses in ANS and services that have integrated ANS.
+
+Get the transactions to update the default domain associated with a .algo name
+### Method: POST
+>```
+>https://ansresolver.com/names/set-default-domain
+>```
+### Body (**raw**)
+
+```json
+/* Sample Body */
+{
+    "name": "johndoe07.algo", 
+    "address": "PRVIUNUJ2TIPL5PK5NFMPTUF2DQL5ZVU7IENDNNB2U4JEGW5FYCEQF2HOQ"
+}
+```
+
+⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃
+
+## Delete property 
+Properties set by the domain owner (socials and hosting information) can be deleted by the owner
+
+Get the transactions to delete a value property associated with a .algo name
+### Method: POST
+>```
+>https://ansresolver.com/names/delete-property
+>```
+### Body (**raw**)
+
+```json
+/* Sample Body */
+{
+    "name": "johndoe07.algo", 
+    "address": "PRVIUNUJ2TIPL5PK5NFMPTUF2DQL5ZVU7IENDNNB2U4JEGW5FYCEQF2HOQ", 
+    "property": "discord"
+}
+```
 
 ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃ ⁃
 

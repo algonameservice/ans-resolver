@@ -1,4 +1,5 @@
 const algosdk = require('algosdk');
+const {ANS} = require('@algonameservice/sdk')
 require('dotenv').config();
 const { Client, Indexer, GetTeal } = require('./Config');
 
@@ -8,6 +9,8 @@ const APP_ID =
   process.env.NETWORK === 'TestNet'
     ? parseInt(process.env.TESTNET_APP_ID, 10)
     : parseInt(process.env.APP_ID, 10);
+
+const sdk = new ANS(client, indexer)
 
 const Algorand = {
 
@@ -125,7 +128,6 @@ const Algorand = {
     
     try {
       let accountInfo = await indexer.lookupAccountByID(lsig.address()).do();
-
       accountInfo = accountInfo.account['apps-local-state'];
 
       const { length } = accountInfo;
@@ -136,7 +138,7 @@ const Algorand = {
           const kv = app['key-value'];
 
           const kvLength = kv.length;
-          let owner;
+          let Owner, Value;
           const data = [];
           const socials = [];
 
@@ -169,10 +171,18 @@ const Algorand = {
               value = algosdk.encodeAddress(
                 new Uint8Array(Buffer.from(value, 'base64'))
               );
-              owner = value;
+              Owner = value;
             }
-            if (j === kvLength - 1 && owner !== undefined) {
-              return { found: true, address: owner, socials, data };
+  
+            if(key === 'value') {
+              value = kv[j].value.bytes;
+              value = algosdk.encodeAddress(
+                new Uint8Array(Buffer.from(value, 'base64'))
+              );
+              Value = value;
+            }
+            if (j === kvLength - 1 && Owner !== undefined) {
+              return { found: true, address: Value ?? Owner, socials, data };
             }
           }
         }
@@ -377,6 +387,61 @@ const Algorand = {
 
     algosdk.assignGroupID(groupTxns);
     return groupTxns;
+  },
+
+  updateValueTxn: async(name, sender, value) => {
+    const params = await client.getTransactionParams().do();
+    name = name.split('.algo')[0];
+
+    const lsig = await Algorand.generateLsig(name);
+
+    const appArgs = [];
+    appArgs.push(new Uint8Array(Buffer.from('update_resolver_account')));
+    
+    return algosdk.makeApplicationNoOpTxn(
+      sender,
+      params,
+      APP_ID,
+      appArgs,
+      [lsig.address(), value]
+    );
+  },
+
+  setDefaultDomain: async(name, sender) => {
+    const params = await client.getTransactionParams().do();
+    name = name.split('.algo')[0];
+
+    const lsig = await Algorand.generateLsig(name);
+
+    const appArgs = [];
+    appArgs.push(new Uint8Array(Buffer.from('set_default_account')));
+    
+    return algosdk.makeApplicationNoOpTxn(
+      sender,
+      params,
+      APP_ID,
+      appArgs,
+      [lsig.address()]
+    );
+  },
+
+  deletePropertyTxn: async(name, sender, property) => {
+    const params = await client.getTransactionParams().do();
+    name = name.split('.algo')[0];
+
+    const lsig = await Algorand.generateLsig(name);
+
+    const appArgs = [];
+    appArgs.push(new Uint8Array(Buffer.from('remove_property')));
+    appArgs.push(new Uint8Array(Buffer.from(property)));
+    
+    return algosdk.makeApplicationNoOpTxn(
+      sender,
+      params,
+      APP_ID,
+      appArgs,
+      [lsig.address()]
+    );
   },
 
   createTransferTransaction: async (name, sender, newOwner, price) => {

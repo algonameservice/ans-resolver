@@ -243,7 +243,110 @@ router.post('/update', async function (req, res) {
   }
 });
 
-// TODO: Name renewal transaction
+router.post('/update-value', async function (req, res) {
+  const params = req.body;
+
+  const name = params.name.split('.')[0];
+  const { address, value } = params;
+  
+  let checkForError = false;
+
+  if (!algosdk.isValidAddress(address)) {
+    res.status(400).json({ success: false, error: 'Invalid address' });
+    checkForError = true;
+  }
+ 
+  if (!checkForError) {
+    let result;
+    try {
+      result = await helper.searchForName(name);
+      if (result.found) {
+        if (result.address !== address)
+          res
+            .status(400)
+            .json({ success: false, error: 'This address is not the owner' });
+        else {
+          const txn = await helper.updateValueTxn(name, address, value);
+          res.status(200).json(txn);
+        }
+      } else {
+        res.status(400).json({ success: false, error: 'Name not registered' });
+      }
+    } catch (err) {
+      res.json({ success: false, error: err.message });
+    }
+  }
+});
+
+router.post('/set-default-domain', async function (req, res) {
+  const params = req.body;
+
+  const name = params.name.split('.')[0];
+  const { address, value } = params;
+  
+  let checkForError = false;
+
+  if (!algosdk.isValidAddress(address)) {
+    res.status(400).json({ success: false, error: 'Invalid address' });
+    checkForError = true;
+  }
+ 
+  if (!checkForError) {
+    let result;
+    try {
+      result = await helper.searchForName(name);
+      if (result.found) {
+        if (result.address !== address)
+          res
+            .status(400)
+            .json({ success: false, error: 'This address is not the owner' });
+        else {
+          const txn = await helper.setDefaultDomain(name, address);
+          res.status(200).json(txn);
+        }
+      } else {
+        res.status(400).json({ success: false, error: 'Name not registered' });
+      }
+    } catch (err) {
+      res.json({ success: false, error: err.message });
+    }
+  }
+});
+
+router.post('/delete-property', async function (req, res) {
+  const params = req.body;
+
+  const name = params.name.split('.')[0];
+  const { address, property } = params;
+  
+  let checkForError = false;
+
+  if (!algosdk.isValidAddress(address)) {
+    res.status(400).json({ success: false, error: 'Invalid address' });
+    checkForError = true;
+  }
+ 
+  if (!checkForError) {
+    let result;
+    try {
+      result = await helper.searchForName(name);
+      if (result.found) {
+        if (result.address !== address)
+          res
+            .status(400)
+            .json({ success: false, error: 'This address is not the owner' });
+        else {
+          const txn = await helper.deletePropertyTxn(name, address, property);
+          res.status(200).json(txn);
+        }
+      } else {
+        res.status(400).json({ success: false, error: 'Name not registered' });
+      }
+    } catch (err) {
+      res.json({ success: false, error: err.message });
+    }
+  }
+});
 
 router.post('/put-for-transfer', async function (req, res) {
   const params = req.body;
