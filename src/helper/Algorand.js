@@ -472,9 +472,10 @@ const Algorand = {
         const info = await indexer
           .searchForTransactions()
           .applicationID(APP_ID || 628095415)
-          .limit(10000)
+          .limit(1000)
           .nextToken(nextToken)
           .afterTime(timestamp)
+          .txType("appl")
           .do();
         txnLength = info.transactions.length;
 
@@ -483,6 +484,7 @@ const Algorand = {
           txns.push(info.transactions);
         }
       } catch (err) {
+        console.log(err);
         return false;
       }
     }

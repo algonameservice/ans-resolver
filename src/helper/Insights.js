@@ -86,7 +86,6 @@ class Insights {
         cacheObject
       );
       cacheObject = { ...latestData };
-
       /*
             let updatedJsonObject = {
                 transactions: cacheObject.transactions,
@@ -103,7 +102,7 @@ class Insights {
             } catch (err) {
                 return false;
             }
-            */
+      */     
     } else {
       cacheObject = { ...insightsInfo };
       let latestData = await this.loadTransactionsAfterTimestamp(
