@@ -23,7 +23,7 @@ module.exports.Indexer = () => {
   if (process.env.NETWORK === 'MainNet') {
     return new algosdk.Indexer(
       '',
-      'https://algoindexer.algoexplorerapi.io',
+      'https://mainnet-idx.algonode.cloud',
       ''
     );
   }

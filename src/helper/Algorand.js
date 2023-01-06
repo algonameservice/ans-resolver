@@ -19,6 +19,7 @@ const Algorand = {
         try{
             let info = await indexer.searchForTransactions().applicationID(APP_ID).
             limit(10000).
+            txType("appl").
             nextToken(nextToken).
             afterTime(timestamp).
             do();
@@ -30,10 +31,10 @@ const Algorand = {
             
             
         }catch(err){
+            console.log(err)
             return false;
         }
     }
-
     let allTxns = [];
     for(let i=0; i<txns.length; i++){
         allTxns=allTxns.concat(txns[i]);
