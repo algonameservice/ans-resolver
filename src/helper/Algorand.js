@@ -52,6 +52,7 @@ const Algorand = {
         if(args.length > 0) {
             if(Buffer.from(args[0], 'base64').toString() === 'register_name'){
                 const domain = Buffer.from(args[1], 'base64').toString();
+                
                 domains[domain] = {
                     lsig: accounts[0],
                     address: sender,
@@ -479,7 +480,6 @@ const Algorand = {
           .txType("appl")
           .do();
         txnLength = info.transactions.length;
-
         if (txnLength > 0) {
           nextToken = info['next-token'];
           txns.push(info.transactions);

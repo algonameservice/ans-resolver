@@ -116,7 +116,6 @@ class Insights {
     let hex;
     let numberStr = '';
     cacheObject.lastTenRegistrations = [];
-
     for (let i = 0; i < cacheObject.transactions.length && count < 10; i++) {
       try {
         let args =

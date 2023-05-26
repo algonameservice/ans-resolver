@@ -27,17 +27,18 @@ let domainsInMemory = {
 
 
 cron.schedule('*/1 * * * *', () => {
-  
   const latestDomains = helper.getLatestDomains(domainsInMemory.timestamp);
   latestDomains.then(res => {
     domainsInMemory.timestamp = new Date();
     const { latestDomainsRetrieved, latestTransfers } = res
-    
     for(let i in latestDomainsRetrieved) {
       const startingLetter = i[0];
       const existing = domainsInMemory[startingLetter].find(domain => domain.name === i+'.algo');
+      
       if(!existing) {
         domainsInMemory[startingLetter].push(latestDomainsRetrieved[i]);
+      } else {
+        domainsInMemory[startingLetter].find(name => name.name === i+'.algo').address = latestDomainsRetrieved[i].address;
       }
     }
     try{
